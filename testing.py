@@ -1,5 +1,6 @@
 from training_data import Data
 from cnn_model import Model
+import numpy as np
 
 
 def loadData_testing(testingData):
@@ -19,16 +20,19 @@ def loadData_testing(testingData):
 
 def train_testing(testingData):
     print('TESTING CNN TRAINING:')
-    for dataset in testingData['dataset']:
+    for i, dataset in enumerate(testingData['dataset']):
         data = Data(dataset)
         data.load()
-        
+        data = getOneDataPoint(data)
+        if not testingData['colour'][i]:
+            data.rgb2greyScale()
+
         try:
             model = Model(data)
         except:
             raise ValueError('Failed when creating model.')
         try:
-            model.build(nConvLayers=2,nFilters=10, kernel=3, stride=2)
+            model.build(nConvLayers=1,nFilters=1, kernel=3, stride=2)
         except:
             raise ValueError('Failed when building model.')
         try:
@@ -36,7 +40,7 @@ def train_testing(testingData):
         except:
             raise ValueError('Failed when compiling model.')
         try:
-            model.train(epochs=1, nBatch=256)
+            model.train(epochs=1, nBatch=256, earlyStopPatience=10)
         except:
             raise ValueError('Failed when training model.')
         try:
@@ -52,8 +56,10 @@ def checkDim(data, refResolution):
     assert data.x_val.shape[1:3] == refResolution[0:2], 'Validation dataset dimension is incorrect'
     assert data.x_test.shape[1:3] == refResolution[0:2], 'Testing dataset dimension is incorrect'
 
+
 def checkChannels(data, refResolution):
     assert data.resolution[2] == refResolution[2], 'Data has an incorrect number of channels'
+
 
 def checkScale(data, lim):
     assert data.x_train.min() >= lim[0] and data.x_train.max() <= lim[1],\
@@ -62,6 +68,12 @@ def checkScale(data, lim):
         'Validation dataset not scaled between {} and {}'.format(lim[0], lim[1])
     assert data.x_test.min() >= lim[0] and data.x_test.max() <= lim[1],\
         'Testing dataset not scaled between {} and {}'.format(lim[0],lim[1])
+
+def getOneDataPoint(data):
+    data.x_train = data.x_train[0].reshape(1, data.resolution[0], data.resolution[1], data.resolution[2])
+    data.x_val = data.x_val[0].reshape(1, data.resolution[0], data.resolution[1], data.resolution[2])
+    data.x_test = data.x_test[0].reshape(1, data.resolution[0], data.resolution[1], data.resolution[2])
+    return data
 
 
 if __name__ == '__main__':
