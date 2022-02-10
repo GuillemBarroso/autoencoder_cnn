@@ -27,8 +27,8 @@ class Data():
 
         def scale():
             self.x_train = self.x_train.astype('float32') / 255.
-            self.x_test = self.x_test.astype('float32') / 255.
             self.x_val = self.x_val.astype('float32') / 255.
+            self.x_test = self.x_test.astype('float32') / 255.
             self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
                           max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
 
@@ -73,7 +73,7 @@ class Data():
             try:  # Try so it accepts having other files or folders that are not images inside the same directory
                 array = self.openImageToArray(imgName)
                 assert self.checkImageSize(array), 'Images with different sizes'
-                assert self.checkChannels(array), 'Some images are coloured and some are grey-scale'
+                assert self.checkChannels(), 'Some images are coloured and some are grey-scale'
                 data.append(array)
             except Exception as e:
                 if self.verbose:
@@ -100,7 +100,7 @@ class Data():
         return channels
 
     def checkImageSize(self, image):
-        return image.shape[0:2] == self.resolution
+        return image.shape == self.resolution
 
     def checkChannels(self):
         return self.resolution[2]
@@ -111,7 +111,7 @@ class Data():
             self.x_train = np.dot(self.x_train[:], rgb_weights)
             self.x_val = np.dot(self.x_val[:], rgb_weights)
             self.x_test = np.dot(self.x_test[:], rgb_weights)
-            self.resolution[2] = 1
+            self.resolution = (self.resolution[0], self.resolution[1], 1)
 
     def summary(self):
         dataInfo = PrettyTable(['Parameter', 'Value'])

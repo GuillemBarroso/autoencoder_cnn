@@ -2,23 +2,27 @@ from training_data import Data
 from cnn_model import Model
 
 
-def loadData_testing(testingDatasets):
+def loadData_testing(testingData):
     print('TESTING DATA LOADING:')
-    for dataset in testingDatasets:
+    for i, dataset in enumerate(testingData['dataset']):
         data = Data(dataset)
         data.load()
-        checkDim(data)
+        checkScale(data, [0, 255])
+        if not testingData['colour'][i]:
+            data.rgb2greyScale()
+        checkDim(data, testingData['resolution'][i])
+        checkChannels(data, testingData['resolution'][i])
         checkScale(data, [0,1])
         print('Data loaded correctly for "{}" dataset'.format(dataset))
     print('\n')
 
 
-def train_testing(testingDatasets):
+def train_testing(testingData):
     print('TESTING CNN TRAINING:')
-    for dataset in testingDatasets:
+    for dataset in testingData['dataset']:
         data = Data(dataset)
         data.load()
-
+        
         try:
             model = Model(data)
         except:
@@ -43,20 +47,29 @@ def train_testing(testingDatasets):
         print('Training successfully tested for "{}" dataset'.format(dataset))
 
 
-def checkDim(data):
-    assert data.x_train.shape[1:3] == data.resolution, 'Training dataset dimension is incorrect'
-    assert data.x_test.shape[1:3] == data.resolution, 'Testing dataset dimension is incorrect'
+def checkDim(data, refResolution):
+    assert data.x_train.shape[1:3] == refResolution[0:2], 'Training dataset dimension is incorrect'
+    assert data.x_val.shape[1:3] == refResolution[0:2], 'Validation dataset dimension is incorrect'
+    assert data.x_test.shape[1:3] == refResolution[0:2], 'Testing dataset dimension is incorrect'
 
+def checkChannels(data, refResolution):
+    assert data.resolution[2] == refResolution[2], 'Data has an incorrect number of channels'
 
 def checkScale(data, lim):
     assert data.x_train.min() >= lim[0] and data.x_train.max() <= lim[1],\
         'Training dataset not scaled between {} and {}'.format(lim[0],lim[1])
+    assert data.x_val.min() >= lim[0] and data.x_val.max() <= lim[1], \
+        'Validation dataset not scaled between {} and {}'.format(lim[0], lim[1])
     assert data.x_test.min() >= lim[0] and data.x_test.max() <= lim[1],\
         'Testing dataset not scaled between {} and {}'.format(lim[0],lim[1])
 
 
 if __name__ == '__main__':
-    testingDatasets = ['mnist', 'afreightdata_test']
-    loadData_testing(testingDatasets)
-    train_testing(testingDatasets)
+    testingData = {
+        'dataset' : ['mnist', 'afreightdata_test', 'afreightdata_test'],
+        'colour' : [False, False, True],
+        'resolution' : [(28, 28, 1), (120, 160, 1), (120, 160, 3)]
+    }
+    loadData_testing(testingData)
+    train_testing(testingData)
 

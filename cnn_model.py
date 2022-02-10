@@ -113,7 +113,7 @@ class Model():
 
     def predict(self):
         self.predictions = self.autoencoder.predict(self.data.x_test)
-        self.test_loss = self.autoencoder.evaluate(self.data.x_test, self.data.x_test)
+        self.test_loss = self.autoencoder.evaluate(self.data.x_test, self.data.x_test, verbose=self.verbose)
         self.code = self.encoder.predict(self.data.x_test)
 
     def summary(self):
