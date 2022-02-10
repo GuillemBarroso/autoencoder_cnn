@@ -56,7 +56,7 @@ class Model():
         ## TODO: add number of filters depending on the stride and varing for each Conv2D layer
         start = timeit.default_timer()
         # Encoder
-        input = layers.Input(shape=(self.data.resolution[0], self.data.resolution[1], self.data.inChannels))
+        input = layers.Input(shape=self.data.resolution)
         encoded = layers.Conv2D(nFilters, kernel, activation="relu", padding="same")(input)
         encoded = layers.MaxPooling2D(stride, padding="same")(encoded)
         for iLayer in range(nConvLayers - 1):
@@ -67,7 +67,7 @@ class Model():
         decoded = layers.Conv2DTranspose(nFilters, kernel, strides=stride, activation="relu", padding="same")(encoded)
         for iLayer in range(nConvLayers - 1):
             decoded = layers.Conv2DTranspose(nFilters, kernel, strides=stride, activation="relu", padding="same")(decoded)
-        decoded = layers.Conv2D(self.data.inChannels, kernel, activation="sigmoid", padding="same")(decoded)
+        decoded = layers.Conv2D(self.data.resolution[2], kernel, activation="sigmoid", padding="same")(decoded)
 
         # Build autoencoder and encoder (so "code" or "latent vector" is accessible)
         self.autoencoder = keras.Model(input, decoded)

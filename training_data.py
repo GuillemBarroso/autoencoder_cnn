@@ -13,7 +13,6 @@ class Data():
         self.x_train = None
         self.dimension = None
         self.resolution = None
-        self.inChannels = None
         self.scale = None
         self.nTrain = None
         self.nTest = None
@@ -90,9 +89,8 @@ class Data():
         return np.asarray(img.getdata()).reshape(img.height, img.width, 3)
 
     def getImageData(self, image):
-        self.resolution = image.shape[0:2]
-        self.dimension = np.prod(self.resolution)
-        self.inChannels = self.getChannels(image)
+        self.resolution = (image.shape[0], image.shape[1], self.getChannels(image))
+        self.dimension = np.prod(self.resolution[0:2])
 
     def getChannels(self, image):
         try:
@@ -104,23 +102,22 @@ class Data():
     def checkImageSize(self, image):
         return image.shape[0:2] == self.resolution
 
-    def checkChannels(self, image):
-        channels = self.getChannels(image)
-        return channels == self.inChannels
+    def checkChannels(self):
+        return self.resolution[2]
 
     def rgb2greyScale(self):
         rgb_weights = [0.2989, 0.5870, 0.1140]
-        if self.inChannels == 3:
+        if self.resolution[2] == 3:
             self.x_train = np.dot(self.x_train[:], rgb_weights)
             self.x_val = np.dot(self.x_val[:], rgb_weights)
             self.x_test = np.dot(self.x_test[:], rgb_weights)
-            self.inChannels = 1
+            self.resolution[2] = 1
 
     def summary(self):
         dataInfo = PrettyTable(['Parameter', 'Value'])
         dataInfo.title = 'Load data'
         dataInfo.add_row(['dataset name', self.dataset])
-        dataInfo.add_row(['image resolution', (self.resolution[0], self.resolution[1], self.inChannels)])
+        dataInfo.add_row(['image resolution', self.resolution])
         dataInfo.add_row(['scale', self.scale])
         dataInfo.add_row(['train data size', self.nTrain])
         dataInfo.add_row(['validation data size', self.nVal])
