@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 
 
 def plottingPrediction(data, model, numDisplay):
+    if numDisplay > data.x_test.shape[0]:
+        numDisplay = data.x_test.shape[0]
     plt.figure(figsize=(20, 4))
     for i in range(numDisplay):
         # Display original

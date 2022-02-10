@@ -40,7 +40,7 @@ def train_testing(testingData):
         except:
             raise ValueError('Failed when compiling model.')
         try:
-            model.train(epochs=1, nBatch=256, earlyStopPatience=10)
+            model.train(epochs=1, nBatch=1, earlyStopPatience=1)
         except:
             raise ValueError('Failed when training model.')
         try:
@@ -49,6 +49,7 @@ def train_testing(testingData):
             raise ValueError('Failed when predicting.')
 
         print('Training successfully tested for "{}" dataset'.format(dataset))
+        del model; del data
 
 
 def checkDim(data, refResolution):

@@ -15,6 +15,7 @@ class Model():
         self.compileTime = None
         self.trainTime = None
         self.autoencoder = None
+        self.encoder = None
         self.predictions = None
         self.nConvLayers = None
         self.nFilters = None
@@ -72,6 +73,7 @@ class Model():
         # Build autoencoder and encoder (so "code" or "latent vector" is accessible)
         self.autoencoder = keras.Model(input, decoded)
         self.encoder = keras.Model(input, encoded)
+        del encoded; del decoded
 
         self.nTrainParam = int(np.sum([K.count_params(w) for w in self.autoencoder.trainable_weights]))
         self.nNonTrainParam = int(np.sum([K.count_params(w) for w in self.autoencoder.non_trainable_weights]))
