@@ -17,6 +17,11 @@ class Data():
         self.nTrain = None
         self.nTest = None
         self.nVal = None
+
+        assert isinstance(testSize, (int,float)), '"testSize" variable must be an integer or a float'
+        assert 0 <= testSize <= 1, 'testSize should be in [0,1]'.format(lim[0], lim[1])
+        assert isinstance(verbose, bool), '"verbose" variable must be a boolean'
+
         self.testSize = testSize
         self.dataset = dataset
         self.verbose = verbose
@@ -85,14 +90,17 @@ class Data():
         return x_train, x_val, x_test
 
     def openImageToArray(self, imgName):
+        assert isinstance(imgName, str)
         img = Image.open('afreightdata/{}'.format(imgName))
         return np.asarray(img.getdata()).reshape(img.height, img.width, 3)
 
     def getImageData(self, image):
+        self.assertNdarray(image)
         self.resolution = (image.shape[0], image.shape[1], self.getChannels(image))
         self.dimension = np.prod(self.resolution[0:2])
 
     def getChannels(self, image):
+        self.assertNdarray(image)
         try:
             channels = image.shape[2]
         except:
@@ -100,10 +108,14 @@ class Data():
         return channels
 
     def checkImageSize(self, image):
+        self.assertNdarray(image)
         return image.shape == self.resolution
 
     def checkChannels(self):
         return self.resolution[2]
+
+    def assertNdarray(self, array):
+        assert type(array).__module__ == np.__name__
 
     def rgb2greyScale(self):
         rgb_weights = [0.2989, 0.5870, 0.1140]

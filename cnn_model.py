@@ -40,6 +40,10 @@ class Model():
         self.stride = stride
 
         def inputCheck():
+            assert isinstance(self.nConvLayers, int), '"nConvLayers" must be an integer'
+            assert isinstance(self.nFilters, int), '"nFilters" must be an integer'
+            assert isinstance(self.kernel, (int,tuple)), '"kernel" must be an integer or a tuple'
+            assert isinstance(self.stride, (int,tuple)), '"stride" must be an integer or a tuple'
             if isinstance(self.kernel, int):
                 self.kernel = (self.kernel, self.kernel)
             if isinstance(self.stride, int):
@@ -60,13 +64,13 @@ class Model():
         input = layers.Input(shape=self.data.resolution)
         encoded = layers.Conv2D(nFilters, kernel, activation="relu", padding="same")(input)
         encoded = layers.MaxPooling2D(stride, padding="same")(encoded)
-        for iLayer in range(nConvLayers - 1):
+        for _ in range(nConvLayers - 1):
             encoded = layers.Conv2D(nFilters, kernel, activation="relu", padding="same")(encoded)
             encoded = layers.MaxPooling2D(stride, padding="same")(encoded)
 
         # Decoder
         decoded = layers.Conv2DTranspose(nFilters, kernel, strides=stride, activation="relu", padding="same")(encoded)
-        for iLayer in range(nConvLayers - 1):
+        for _ in range(nConvLayers - 1):
             decoded = layers.Conv2DTranspose(nFilters, kernel, strides=stride, activation="relu", padding="same")(decoded)
         decoded = layers.Conv2D(self.data.resolution[2], kernel, activation="sigmoid", padding="same")(decoded)
 
@@ -82,6 +86,8 @@ class Model():
         self.buildTime = stop - start
 
     def compile(self,optimizer='adam', loss='mean_squared_error'):
+        assert isinstance(optimizer, str), '"optimizer" must be a string'
+        assert isinstance(loss, str), '"loss" must be a string'
         start = timeit.default_timer()
         self.optimizer = optimizer
         self.loss = loss
@@ -93,6 +99,9 @@ class Model():
             self.autoencoder.summary()
 
     def train(self, epochs=50, nBatch=32, earlyStopPatience=10):
+        assert isinstance(epochs, int), '"epochs" must be an integer'
+        assert isinstance(nBatch, int), '"nBatch" must be an integer'
+        assert isinstance(earlyStopPatience, int), '"earlyStopPatience" must be an integer'
         start = timeit.default_timer()
         self.epochs = epochs
         self.nBatch = nBatch
