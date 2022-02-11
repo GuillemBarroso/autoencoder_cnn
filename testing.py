@@ -1,7 +1,10 @@
 from training_data import Data
 from cnn_model import Model
 import numpy as np
+import pytest
 
+## TODO: Add unit testing using pytest
+## TODO: Refactor with autoencoder_cnn and test folders
 
 def loadData_testing(testingData):
     print('TESTING DATA LOADING:')

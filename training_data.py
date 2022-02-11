@@ -18,6 +18,7 @@ class Data():
         self.nTest = None
         self.nVal = None
 
+        assert isinstance(dataset, str), '"dataset" variable must be a string'
         assert isinstance(testSize, (int,float)), '"testSize" variable must be an integer or a float'
         assert 0 <= testSize <= 1, 'testSize should be in [0,1]'.format(lim[0], lim[1])
         assert isinstance(verbose, bool), '"verbose" variable must be a boolean'
