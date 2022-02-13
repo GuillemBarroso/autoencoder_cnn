@@ -17,10 +17,11 @@ class Data():
         self.nTrain = None
         self.nTest = None
         self.nVal = None
+        self.dirPath = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
         assert isinstance(testSize, (int,float)), '"testSize" variable must be an integer or a float'
-        assert 0 <= testSize <= 1, 'testSize should be in [0,1]'.format(lim[0], lim[1])
+        assert 0 <= testSize <= 1, 'testSize should be in [0,1]'
         assert isinstance(verbose, bool), '"verbose" variable must be a boolean'
 
         self.testSize = testSize
@@ -29,7 +30,7 @@ class Data():
 
     def load(self):
         def existsDirectory():
-            return os.path.isdir('./{}'.format(self.dataset))
+            return os.path.isdir(self.dirPath)
 
         def scale():
             self.x_train = self.x_train.astype('float32') / 255.
@@ -49,6 +50,7 @@ class Data():
             self.x_train, self.x_val = train_test_split(np.asarray(self.x_train), test_size=0.1, shuffle=False)
             self.getImageData(self.x_train[0])
         else:
+            self.dirPath = './{}'.format(self.dataset)
             if existsDirectory():
                 self.x_train, self.x_val, self.x_test = self.loadImagesFromDir()
             else:
@@ -62,7 +64,7 @@ class Data():
         def findFirstValidFile(imgList):
             findImageData = True
             i = 0
-            while findImageData:
+            while findImageData and i <= len(imgList):
                 try:
                     array = self.openImageToArray(imgList[i])
                     self.getImageData(array)
@@ -70,7 +72,7 @@ class Data():
                 except:
                     i += 1
 
-        imgList = os.listdir('{}/.'.format(self.dataset))
+        imgList = os.listdir(self.dirPath)
         findFirstValidFile(imgList)
 
         # Loop over images and store them in the proper format
@@ -92,7 +94,7 @@ class Data():
 
     def openImageToArray(self, imgName):
         assert isinstance(imgName, str)
-        img = Image.open('afreightdata/{}'.format(imgName))
+        img = Image.open('{}/{}'.format(self.dirPath, imgName))
         return np.asarray(img.getdata()).reshape(img.height, img.width, 3)
 
     def getImageData(self, image):

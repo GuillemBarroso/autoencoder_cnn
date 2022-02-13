@@ -32,24 +32,24 @@ def train_testing(testingData):
 
         try:
             model = Model(data)
-        except:
-            raise ValueError('Failed when creating model.')
+        except Exception as e:
+            raise ValueError('Failed when creating model. {}'.format(e))
         try:
-            model.build(nConvLayers=1,nFilters=1, kernel=3, stride=2)
-        except:
-            raise ValueError('Failed when building model.')
+            model.build(nConvBlock=1,nFilters=1, kernel=0.1, stride=2)
+        except Exception as e:
+            raise ValueError('Failed when building model. {}'.format(e))
         try:
             model.compile(optimizer='adam',loss='mean_squared_error')
-        except:
-            raise ValueError('Failed when compiling model.')
+        except Exception as e:
+            raise ValueError('Failed when compiling model. {}'.format(e))
         try:
             model.train(epochs=1, nBatch=1, earlyStopPatience=1)
-        except:
-            raise ValueError('Failed when training model.')
+        except Exception as e:
+            raise ValueError('Failed when training model. {}'.format(e))
         try:
             model.predict()
-        except:
-            raise ValueError('Failed when predicting.')
+        except Exception as e:
+            raise ValueError('Failed when predicting. {}'.format(e))
 
         print('Training successfully tested for "{}" dataset'.format(dataset))
         del model; del data
