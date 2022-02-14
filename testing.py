@@ -35,7 +35,7 @@ def train_testing(testingData):
         except Exception as e:
             raise ValueError('Failed when creating model. {}'.format(e))
         try:
-            model.build(nConvBlock=1,nFilters=1, kernel=0.1, stride=2)
+            model.build(nConvBlocks=1,nFilters=1, kernelSize=1, stride=2)
         except Exception as e:
             raise ValueError('Failed when building model. {}'.format(e))
         try:

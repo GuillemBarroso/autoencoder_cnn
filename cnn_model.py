@@ -48,8 +48,12 @@ class Model():
             assert isinstance(self.stride, (int,tuple)), '"stride" must be an integer or a tuple'
             if isinstance(self.nFilters, list):
                 assert len(self.nFilters) == self.nConvBlocks, '"nFilters" list length must match "nConvBlocks"'
+            else:
+                self.nFilters = [self.nFilters]
             if isinstance(self.kernelSize, list):
                 assert len(self.kernelSize) == self.nConvBlocks, '"kernelSize" list length must match "nConvBlocks"'
+            else:
+                self.kernelSize = [self.kernelSize]
 
             self.red_res = (self.data.resolution[0]/self.stride**self.nConvBlocks,
                        self.data.resolution[1]/self.stride**self.nConvBlocks)

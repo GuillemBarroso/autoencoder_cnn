@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 import os, os.path
 from prettytable import PrettyTable
 import timeit
+import pandas as pd
+import dataframe_image as dfi
 
 
 class Data():
