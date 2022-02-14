@@ -4,3 +4,5 @@
 /__pycache__/*
 Icon?
 /.vscode
+/trunk
+/trunk_test

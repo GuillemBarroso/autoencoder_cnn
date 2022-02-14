@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import dataframe_image as dfi
 
 
 def plottingPrediction(data, model, numDisplay):
@@ -38,3 +40,11 @@ def plotTraining(history, trainTime):
     plt.xlabel('epoch')
     plt.legend(['training', 'validation'], loc='upper right')
     plt.show()
+
+
+def summaryInfo(info, printInfo, saveInfo, name):
+    df = pd.DataFrame(info, columns=['Parameter', 'Value'])
+    if printInfo:
+        print(df)
+    if saveInfo:
+        dfi.export(df, name)

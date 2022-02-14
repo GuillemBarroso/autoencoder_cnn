@@ -3,14 +3,11 @@ import numpy as np
 from PIL import Image
 from sklearn.model_selection import train_test_split
 import os, os.path
-from prettytable import PrettyTable
 import timeit
-import pandas as pd
-import dataframe_image as dfi
-
+from postprocessing import summaryInfo
 
 class Data():
-    def __init__(self, dataset, testSize=0.1, verbose=False):
+    def __init__(self, dataset, testSize=0.1, verbose=False, saveInfo=False):
         self.x_test = None
         self.x_train = None
         self.dimension = None
@@ -20,15 +17,18 @@ class Data():
         self.nTest = None
         self.nVal = None
         self.dirPath = None
+        self.summary = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
         assert isinstance(testSize, (int,float)), '"testSize" variable must be an integer or a float'
         assert 0 <= testSize <= 1, 'testSize should be in [0,1]'
         assert isinstance(verbose, bool), '"verbose" variable must be a boolean'
+        assert isinstance(saveInfo, bool), '"saveSummary" variable must be a boolean'
 
         self.testSize = testSize
         self.dataset = dataset
         self.verbose = verbose
+        self.saveInfo = saveInfo
 
     def load(self):
         def existsDirectory():
@@ -46,6 +46,17 @@ class Data():
             self.nTest = self.x_test.shape[0]
             self.nVal = self.x_val.shape[0]
 
+        def summary():
+            data = [['dataset name', self.dataset],
+            ['image resolution', self.resolution],
+            ['scale', self.scale],
+            ['train data size', self.nTrain],
+            ['validation data size', self.nVal],
+            ['test data size', self.nTest],
+            ['load time', '{:.2}s'.format(self.loadTime)]]
+            name = 'results/loadData_{}.png'.format(self.dataset)
+            summaryInfo(data, self.verbose, self.saveInfo, name)
+
         start = timeit.default_timer()
         if self.dataset == 'mnist':
             (self.x_train, _), (self.x_test, _) = mnist.load_data()
@@ -57,10 +68,13 @@ class Data():
                 self.x_train, self.x_val, self.x_test = self.loadImagesFromDir()
             else:
                 raise ValueError('Invalid dataset name. "dataset" should be the name of the directory')
-        scale()
-        getDataSize()
+
         stop = timeit.default_timer()
         self.loadTime = stop - start
+
+        scale()
+        getDataSize()
+        summary()
 
     def loadImagesFromDir(self):
         def findFirstValidFile(imgList):
@@ -129,15 +143,3 @@ class Data():
             self.x_val = np.dot(self.x_val[:], rgb_weights)
             self.x_test = np.dot(self.x_test[:], rgb_weights)
             self.resolution = (self.resolution[0], self.resolution[1], 1)
-
-    def summary(self):
-        dataInfo = PrettyTable(['Parameter', 'Value'])
-        dataInfo.title = 'Load data'
-        dataInfo.add_row(['dataset name', self.dataset])
-        dataInfo.add_row(['image resolution', self.resolution])
-        dataInfo.add_row(['scale', self.scale])
-        dataInfo.add_row(['train data size', self.nTrain])
-        dataInfo.add_row(['validation data size', self.nVal])
-        dataInfo.add_row(['test data size', self.nTest])
-        dataInfo.add_row(['load time', '{:.2}s'.format(self.loadTime)])
-        print(dataInfo)

@@ -2,15 +2,13 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import timeit
 from prettytable import PrettyTable
-from postprocessing import plotTraining
+from postprocessing import plotTraining, summaryInfo
 import tensorflow.keras.backend as K
 import numpy as np
 
 
 class Model():
-    def __init__(self, data, verbose=False):
-        self.data = data
-        self.verbose = verbose
+    def __init__(self, data, verbose=False, saveInfo=False):
         self.buildTime = None
         self.compileTime = None
         self.trainTime = None
@@ -34,7 +32,27 @@ class Model():
         self.nNonTrainParam = None
         self.codeSize = None
 
+        assert isinstance(data, object), '"data" must be an object'
+        assert isinstance(verbose, bool), '"verbose" must be a string'
+        assert isinstance(saveInfo, bool), '"saveInfo" must be a boolean'
+
+        self.data = data
+        self.verbose = verbose
+        self.saveInfo = saveInfo
+
     def build(self, nConvBlocks=1, codeSize=36, nFilters=10, kernelSize=3, stride=2):
+        def summary():
+            data = [['nConvBlocks', self.nConvBlocks],
+            ['nFilters', self.nFilters],
+            ['kernelSize', self.kernelSize],
+            ['stride size', self.stride],
+            ['code size', self.codeSize],
+            ['num trainable param', self.nTrainParam],
+            ['num non trainable param', self.nNonTrainParam],
+            ['build time', '{:.2}s'.format(self.buildTime)]]
+            name = 'results/buildModel_{}.png'.format(self.data.dataset)
+            summaryInfo(data, self.verbose, self.saveInfo, name)
+
         self.nConvBlocks = nConvBlocks
         self.nFilters = nFilters
         self.kernelSize = kernelSize
@@ -98,8 +116,17 @@ class Model():
 
         stop = timeit.default_timer()
         self.buildTime = stop - start
+        summary()
 
     def compile(self,optimizer='adam', loss='mean_squared_error'):
+        def summary():
+            data = [['nConvBlocks', self.nConvBlocks],
+            ['optimizer', self.optimizer],
+            ['loss function', self.loss],
+            ['compile time', '{:.2}s'.format(self.compileTime)]]
+            name = 'results/compileModel_{}.png'.format(self.data.dataset)
+            summaryInfo(data, self.verbose, self.saveInfo, name)
+
         assert isinstance(optimizer, str), '"optimizer" must be a string'
         assert isinstance(loss, str), '"loss" must be a string'
         start = timeit.default_timer()
@@ -109,11 +136,22 @@ class Model():
 
         stop = timeit.default_timer()
         self.compileTime = stop - start
+        summary()
         if self.verbose:
             self.autoencoder.summary()
 
     def train(self, epochs=50, nBatch=32, earlyStopPatience=10, earlyStopTol=10e-4):
-        ## TODO: add min_delta outside as a default param
+        def summary():
+            data = [['epochs', self.epochs],
+            ['nBatch', self.nBatch],
+            ['early stop patience', '{} epochs'.format(self.earlyStopPatience)],
+            ['training time', '{:.2}s'.format(self.trainTime)],
+            ['min training loss', '{:.2}'.format(self.min_loss)],
+            ['min validation loss', '{:.2}'.format(self.min_valLoss)],
+            ['test loss evaluation', '{:.2}'.format(self.test_loss)]]
+            name = 'results/compileModel_{}.png'.format(self.data.dataset)
+            summaryInfo(data, self.verbose, self.saveInfo, name)
+
         assert isinstance(epochs, int), '"epochs" must be an integer'
         assert isinstance(nBatch, int), '"nBatch" must be an integer'
         assert isinstance(earlyStopPatience, int), '"earlyStopPatience" must be an integer'
@@ -133,6 +171,7 @@ class Model():
         self.min_valLoss = min(self.history.history['val_loss'])
         stop = timeit.default_timer()
         self.trainTime = stop - start
+        summary()
         if self.verbose:
             plotTraining(self.history, self.trainTime)
 
@@ -142,38 +181,6 @@ class Model():
         self.predictions = self.autoencoder.predict(self.data.x_test)
         self.test_loss = self.autoencoder.evaluate(self.data.x_test, self.data.x_test, verbose=self.verbose)
         self.code = self.encoder.predict(self.data.x_test)
-
-    def summary(self):
-        buildInfo = PrettyTable(['Parameter', 'Value'])
-        buildInfo.title = 'Build model'
-        buildInfo.add_row(['nConvBlocks', self.nConvBlocks])
-        buildInfo.add_row(['nFilters', self.nFilters])
-        buildInfo.add_row(['kernelSize size', self.kernelSize])
-        buildInfo.add_row(['stride size', self.stride])
-        buildInfo.add_row(['code size', (self.red_res[0], self.red_res[1], self.nFilters)])
-        buildInfo.add_row(['num trainable param', self.nTrainParam])
-        buildInfo.add_row(['num non trainable param', self.nNonTrainParam])
-        buildInfo.add_row(['build time', '{:.2}s'.format(self.buildTime)])
-
-        compileInfo = PrettyTable(['Parameter', 'Value'])
-        compileInfo.title = 'Compile model'
-        compileInfo.add_row(['optimizer', self.optimizer])
-        compileInfo.add_row(['loss function', self.loss])
-        compileInfo.add_row(['compile time', '{:.2}s'.format(self.compileTime)])
-
-        trainInfo = PrettyTable(['Parameter', 'Value'])
-        trainInfo.title = 'Training model'
-        trainInfo.add_row(['epochs', self.epochs])
-        trainInfo.add_row(['nBatch', self.nBatch])
-        trainInfo.add_row(['early stop patience', '{} epochs'.format(self.earlyStopPatience)])
-        trainInfo.add_row(['training time', '{:.2}s'.format(self.trainTime)])
-        trainInfo.add_row(['min training loss', '{:.2}'.format(self.min_loss)])
-        trainInfo.add_row(['min validation loss', '{:.2}'.format(self.min_valLoss)])
-        trainInfo.add_row(['test loss evaluation', '{:.2}'.format(self.test_loss)])
-
-        print(buildInfo)
-        print(compileInfo)
-        print(trainInfo)
 
     class Encoder():
         def __init__(self, model, input):
