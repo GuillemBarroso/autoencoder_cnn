@@ -17,10 +17,10 @@ class Model():
         self.autoencoder = None
         self.encoder = None
         self.predictions = None
-        self.nConvBlock = None
+        self.nConvBlocks = None
         self.nFilters = None
-        self.kernel = None
         self.stride = None
+        self.kernelSize = None
         self.optimizer = None
         self.loss = None
         self.epochs = None
@@ -34,24 +34,25 @@ class Model():
         self.nNonTrainParam = None
         self.codeSize = None
 
-    def build(self, nConvBlock=2, codeSize=36, nFilters=10, kernel=0.1, stride=2):
-        self.nConvBlock = nConvBlock
+    def build(self, nConvBlocks=1, codeSize=36, nFilters=10, kernelSize=3, stride=2):
+        self.nConvBlocks = nConvBlocks
         self.nFilters = nFilters
-        self.kernel = kernel
+        self.kernelSize = kernelSize
         self.stride = stride
         self.codeSize = codeSize
 
         def inputCheck():
-            assert isinstance(self.nConvBlock, int), '"nConvBlock" must be an integer'
-            assert isinstance(self.nFilters, int), '"nFilters" must be an integer'
-            assert isinstance(self.kernel, float), '"kernel" must be a float'
-            assert 0 <= self.kernel <= 1, '"kernel" should be in [0,1]'
+            assert isinstance(self.nConvBlocks, int), '"nConvBlock" must be an integer'
+            assert isinstance(self.nFilters, (list,int)), '"nFilters" must be a a list or an integer'
+            assert isinstance(self.kernelSize, (list,int,tuple)), '"kernel" must be an integer or a tuple'
             assert isinstance(self.stride, (int,tuple)), '"stride" must be an integer or a tuple'
-            self.kernel = (self.kernel, self.kernel)
-            if isinstance(self.stride, int):
-                self.stride = (self.stride, self.stride)
-            self.red_res = (self.data.resolution[0]/self.stride[0]**self.nConvBlock,
-                       self.data.resolution[1]/self.stride[1]**self.nConvBlock)
+            if isinstance(self.nFilters, list):
+                assert len(self.nFilters) == self.nConvBlocks, '"nFilters" list length must match "nConvBlocks"'
+            if isinstance(self.kernelSize, list):
+                assert len(self.kernelSize) == self.nConvBlocks, '"kernelSize" list length must match "nConvBlocks"'
+
+            self.red_res = (self.data.resolution[0]/self.stride**self.nConvBlocks,
+                       self.data.resolution[1]/self.stride**self.nConvBlocks)
             if not self.red_res[0].is_integer() or not self.red_res[1].is_integer():
                 raise ValueError('Conflict between image resolution, number of convolutional blocks and stride:\n'
                                  'Original image is {}x{} and encoder would reduce it to {}x{}'.format(
@@ -60,31 +61,28 @@ class Model():
 
         start = timeit.default_timer()
         inputCheck()
-        kernelSize = (int(self.kernel[0]*self.data.resolution[0]), int(self.kernel[1]*self.data.resolution[1]))
-        nFilters = [10, 10]
-        kernelSize = [(3,3), (3,3)]
 
         # Encoder
         input = layers.Input(shape=self.data.resolution)
-        encoded = self.Encoder(input, nConvBlock, nFilters, kernelSize, stride)
+        encoded = self.Encoder(self, input)
         encoded = encoded.build()
 
         # Fully-connected layers to compress information
         encoded = layers.Flatten()(encoded)
-        nNeuronsDense = self.red_res[0]*self.red_res[1]*nFilters[-1]
-        encoded = layers.Dense(nNeuronsDense*0.1, activation='relu')(encoded)
-        encoded = layers.Dense(nNeuronsDense*0.01, activation='relu')(encoded)
+        nNeuronsDense = self.red_res[0]*self.red_res[1]*self.nFilters[-1]
+        # encoded = layers.Dense(nNeuronsDense*0.1, activation='relu')(encoded)
+        # encoded = layers.Dense(nNeuronsDense*0.01, activation='relu')(encoded)
         encoded = layers.Dense(self.codeSize, activation='relu')(encoded)
 
-        decoded = layers.Dense(nNeuronsDense*0.1*0.1, activation='relu')(encoded)
-        decoded = layers.Dense(nNeuronsDense*0.1, activation='relu')(decoded)
-        decoded = layers.Dense(nNeuronsDense, activation='relu')(decoded)
-        decoded = layers.Reshape((self.red_res[0], self.red_res[1], nFilters[-1]))(decoded)
+        # decoded = layers.Dense(nNeuronsDense*0.1*0.1, activation='relu')(encoded)
+        # decoded = layers.Dense(nNeuronsDense*0.1, activation='relu')(decoded)
+        decoded = layers.Dense(nNeuronsDense, activation='relu')(encoded)
+        decoded = layers.Reshape((self.red_res[0], self.red_res[1], self.nFilters[-1]))(decoded)
 
         # Decoder
-        decoded = self.Decoder(decoded, nConvBlock, list(reversed(nFilters)), list(reversed(kernelSize)), stride)
+        decoded = self.Decoder(self, decoded)
         decoded = decoded.build()
-        decoded = layers.Conv2D(self.data.resolution[2], kernelSize[0], activation="sigmoid", padding="same")(decoded)
+        decoded = layers.Conv2D(self.data.resolution[2], self.kernelSize[0], activation="sigmoid", padding="same")(decoded)
 
         # Build autoencoder and encoder (so "code" or "latent vector" is accessible)
         self.autoencoder = keras.Model(input, decoded)
@@ -115,6 +113,7 @@ class Model():
         assert isinstance(epochs, int), '"epochs" must be an integer'
         assert isinstance(nBatch, int), '"nBatch" must be an integer'
         assert isinstance(earlyStopPatience, int), '"earlyStopPatience" must be an integer'
+        assert isinstance(earlyStopTol, float), '"earlyStopTol" must be a float'
         start = timeit.default_timer()
         self.epochs = epochs
         self.nBatch = nBatch
@@ -143,9 +142,9 @@ class Model():
     def summary(self):
         buildInfo = PrettyTable(['Parameter', 'Value'])
         buildInfo.title = 'Build model'
-        buildInfo.add_row(['nConvBlock', self.nConvBlock])
+        buildInfo.add_row(['nConvBlocks', self.nConvBlocks])
         buildInfo.add_row(['nFilters', self.nFilters])
-        buildInfo.add_row(['kernel size', self.kernel])
+        buildInfo.add_row(['kernelSize size', self.kernelSize])
         buildInfo.add_row(['stride size', self.stride])
         buildInfo.add_row(['code size', (self.red_res[0], self.red_res[1], self.nFilters)])
         buildInfo.add_row(['num trainable param', self.nTrainParam])
@@ -173,32 +172,25 @@ class Model():
         print(trainInfo)
 
     class Encoder():
-        def __init__(self, input, nConvBlock, nFilters, kernelSize, stride):
+        def __init__(self, model, input):
             self.input = input
-            self.nConvBlock = nConvBlock
-            self.nFilters = nFilters
-            self.kernelSize = kernelSize
-            self.stride = stride
-
+            self.model = model
         def build(self):
-            for iBlock in range(self.nConvBlock):
-                encoded = layers.Conv2D(self.nFilters[iBlock], self.kernelSize[iBlock], activation="relu", padding="same",
-                kernel_initializer='he_uniform', activity_regularizer=keras.regularizers.l1(10e-10))(self.input)
-                encoded = layers.MaxPooling2D(self.stride, padding="same")(encoded)
+            for iBlock in range(self.model.nConvBlocks):
+                encoded = layers.Conv2D(self.model.nFilters[iBlock], self.model.kernelSize[iBlock], self.model.stride, activation="relu", padding="same")(self.input)
+                # encoded = layers.MaxPooling2D(self.model.stride, padding="same")(encoded)
                 self.input = encoded
             return encoded
 
     class Decoder():
-        def __init__(self, input, nConvBlock, nFilters, kernelSize, stride):
+        def __init__(self, model, input):
+            self.model = model
             self.input = input
-            self.nConvBlock = nConvBlock
-            self.nFilters = nFilters
-            self.kernelSize = kernelSize
-            self.stride = stride
 
         def build(self):
-            for iBlock in range(self.nConvBlock):
-                decoded = layers.Conv2DTranspose(self.nFilters[iBlock], self.kernelSize[iBlock], strides=self.stride, activation="relu", padding="same",
-                kernel_initializer='he_uniform', activity_regularizer=keras.regularizers.l1(10e-10))(self.input)
+            reversedFilters = list(reversed(self.model.nFilters))
+            revKernelSize = list(reversed(self.model.kernelSize))
+            for iBlock in range(self.model.nConvBlocks):
+                decoded = layers.Conv2DTranspose(reversedFilters[iBlock], revKernelSize[iBlock], strides=self.model.stride, activation="relu", padding="same")(self.input)
                 self.input = decoded
             return decoded

@@ -14,9 +14,9 @@ if __name__ == '__main__':
     data.rgb2greyScale()
 
     model = Model(data,verbose=True)
-    model.build(nConvBlock=2, nFilters=10, kernel=3, stride=2)
+    model.build(nConvBlocks=3, nFilters=[10, 30, 60], kernelSize= [3, 3, 3], stride=2)
     model.compile(optimizer='adam', loss='mean_squared_error')
-    model.train(epochs=500, nBatch=16, earlyStopPatience=10)
+    model.train(epochs=500, nBatch=32, earlyStopPatience=10, earlyStopTol=10e-5)
     model.predict()
 
     if printSummary:
