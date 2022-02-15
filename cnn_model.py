@@ -141,17 +141,6 @@ class Model():
             self.autoencoder.summary()
 
     def train(self, epochs=50, nBatch=32, earlyStopPatience=10, earlyStopTol=10e-4):
-        def summary():
-            data = [['epochs', self.epochs],
-            ['nBatch', self.nBatch],
-            ['early stop patience', '{} epochs'.format(self.earlyStopPatience)],
-            ['training time', '{:.2}s'.format(self.trainTime)],
-            ['min training loss', '{:.2}'.format(self.min_loss)],
-            ['min validation loss', '{:.2}'.format(self.min_valLoss)],
-            ['test loss evaluation', '{:.2}'.format(self.test_loss)]]
-            name = 'results/compileModel_{}.png'.format(self.data.dataset)
-            summaryInfo(data, self.verbose, self.saveInfo, name)
-
         assert isinstance(epochs, int), '"epochs" must be an integer'
         assert isinstance(nBatch, int), '"nBatch" must be an integer'
         assert isinstance(earlyStopPatience, int), '"earlyStopPatience" must be an integer'
@@ -171,16 +160,26 @@ class Model():
         self.min_valLoss = min(self.history.history['val_loss'])
         stop = timeit.default_timer()
         self.trainTime = stop - start
-        summary()
         if self.verbose:
             plotTraining(self.history, self.trainTime)
 
         ## TODO: save model and load saved models
 
     def predict(self):
+        def summary():
+            data = [['epochs', self.epochs],
+            ['nBatch', self.nBatch],
+            ['early stop patience', '{} epochs'.format(self.earlyStopPatience)],
+            ['training time', '{:.2}s'.format(self.trainTime)],
+            ['min training loss', '{:.2}'.format(self.min_loss)],
+            ['min validation loss', '{:.2}'.format(self.min_valLoss)],
+            ['test loss evaluation', '{:.2}'.format(self.test_loss)]]
+            name = 'results/compileModel_{}.png'.format(self.data.dataset)
+            summaryInfo(data, self.verbose, self.saveInfo, name)
         self.predictions = self.autoencoder.predict(self.data.x_test)
         self.test_loss = self.autoencoder.evaluate(self.data.x_test, self.data.x_test, verbose=self.verbose)
         self.code = self.encoder.predict(self.data.x_test)
+        summary()
 
     class Encoder():
         def __init__(self, model, input):
