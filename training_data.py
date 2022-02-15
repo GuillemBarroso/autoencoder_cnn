@@ -143,3 +143,7 @@ class Data():
             self.x_val = np.dot(self.x_val[:], rgb_weights)
             self.x_test = np.dot(self.x_test[:], rgb_weights)
             self.resolution = (self.resolution[0], self.resolution[1], 1)
+        elif self.resolution[2] == 1:
+            print('Image already in grey scale')
+        else:
+            raise ValueError('Number of channels in the image not supported. It must be either 1 or 3.') 
