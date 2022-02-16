@@ -45,14 +45,14 @@ shown in the figure above (7, 2, 1, 0 and 4).
 
 ### Training, validation and testing datasets
 
-<img src="./images/afreight_loadData.png" width="30%" height="30%" />
+<img src="./results/afreight_loadData.png" width="30%" height="30%" />
 
 
 ### Building and compiling model
 
 <p float="left">
-  <img src="./images/afreight_buildModel.png" width="30%" height="30%" />
-  <img src="./images/afreight_compileModel.png" width="30%" height="30%" />
+  <img src="./results/afreight_buildModel.png" width="30%" height="30%" />
+  <img src="./results/afreight_compileModel.png" width="30%" height="30%" />
 </p>
 
 ### Autoencoder training
@@ -60,8 +60,8 @@ shown in the figure above (7, 2, 1, 0 and 4).
 Training parameters and loss functions obtained durig training.
 
 <p float="left">
-  <img src="./images/afreight_trainModel.png" width="30%" height="30%" />
-  <img src="./images/afreight_trainingLoss.png" width="50%" height="50%" />
+  <img src="./results/afreight_trainModel.png" width="30%" height="30%" />
+  <img src="./results/afreight_trainingLoss.png" width="50%" height="50%" />
 </p>
 
 ### Prediction results
@@ -70,4 +70,4 @@ Results obtained using the autoencoder. First row corresponds to the original
 image and second row are the recevered image after being passed through
 the autoencoder.
 
-<img src="./images/afreight_testResults.png" width="100%" height="100%" />
+<img src="./results/afreight_testResults.png" width="100%" height="100%" />
