@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 from keras.datasets import mnist
 import numpy as np
 from PIL import Image
@@ -61,7 +62,8 @@ class Data():
         if self.dataset == 'mnist':
             (self.x_train, _), (self.x_test, _) = mnist.load_data()
             self.x_train, self.x_val = train_test_split(np.asarray(self.x_train), test_size=0.1, shuffle=False)
-            self.getImageData(self.x_train[0])
+            self.resolution = (self.x_train[0].shape[0], self.x_train[0].shape[1], 1)
+            self.dimension = np.prod(self.resolution[0:2])
         else:
             self.dirPath = './{}'.format(self.dataset)
             if existsDirectory():
@@ -82,8 +84,7 @@ class Data():
             i = 0
             while findImageData and i <= len(imgList):
                 try:
-                    array = self.openImageToArray(imgList[i])
-                    self.getImageData(array)
+                    array = self.openImageToArray(imgList[i], isFirst=True)
                     findImageData = False
                 except:
                     i += 1
@@ -108,22 +109,21 @@ class Data():
         x_train, x_val = train_test_split(np.asarray(x_train), test_size=valSize, shuffle=True)
         return x_train, x_val, x_test
 
-    def openImageToArray(self, imgName):
+    def openImageToArray(self, imgName, isFirst=None):
         assert isinstance(imgName, str)
         img = Image.open('{}/{}'.format(self.dirPath, imgName))
-        return np.asarray(img.getdata()).reshape(img.height, img.width, 3)
-
-    def getImageData(self, image):
-        self.assertNdarray(image)
-        self.resolution = (image.shape[0], image.shape[1], self.getChannels(image))
-        self.dimension = np.prod(self.resolution[0:2])
+        if isFirst:
+            self.resolution = (img.height, img.width, self.getChannels(img))
+            self.dimension = np.prod(self.resolution[0:2])
+        return np.asarray(img.getdata()).reshape(self.resolution)
 
     def getChannels(self, image):
-        self.assertNdarray(image)
-        try:
-            channels = image.shape[2]
-        except:
+        if image.mode == 'L':
             channels = 1
+        elif image.mode == 'RGB':
+            channels = 3
+        else:
+            raise ValueError('Image mode not implemented (for now only "L" and "RGB")')
         return channels
 
     def checkImageSize(self, image):
@@ -146,4 +146,4 @@ class Data():
         elif self.resolution[2] == 1:
             print('Image already in grey scale')
         else:
-            raise ValueError('Number of channels in the image not supported. It must be either 1 or 3.') 
+            raise ValueError('Number of channels in the image not supported. It must be either 1 or 3.')

@@ -82,9 +82,9 @@ def getOneDataPoint(data):
 
 if __name__ == '__main__':
     testingData = {
-        'dataset' : ['mnist', 'afreightdata_test', 'afreightdata_test'],
-        'colour' : [False, False, True],
-        'resolution' : [(28, 28, 1), (120, 160, 1), (120, 160, 3)]
+        'dataset' : ['mnist', 'afreightdata_test', 'afreightdata_test', 'beam_test'],
+        'colour' : [False, False, True, False],
+        'resolution' : [(28, 28, 1), (120, 160, 1), (120, 160, 3), (100,300,1)]
     }
     loadData_testing(testingData)
     train_testing(testingData)

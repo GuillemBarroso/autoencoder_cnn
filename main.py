@@ -4,7 +4,7 @@ from postprocessing import plottingPrediction
 
 
 if __name__ == '__main__':
-    dataset = 'mnist'
+    dataset = 'beam_test'
     plotPredictions = True
 
     data = Data(dataset,verbose=True, saveInfo=True)
