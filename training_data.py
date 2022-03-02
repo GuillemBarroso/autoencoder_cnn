@@ -150,8 +150,8 @@ class Data():
 
     def blackAndWhite(self,threshold=0.3):
         if self.resolution[2] == 1:
-            self.x_train2  = np.where(self.x_train > threshold, 1, 0)
-            self.x_val2  = np.where(self.x_val > threshold, 1, 0)
-            self.x_test2  = np.where(self.x_test > threshold, 1, 0)
+            self.x_train  = np.where(self.x_train > threshold, 1, 0)
+            self.x_val  = np.where(self.x_val > threshold, 1, 0)
+            self.x_test  = np.where(self.x_test > threshold, 1, 0)
         else:
             print('BlackAndWhite method only supported for greyScale images. Since dataset is coloured this option has been neglected.')
