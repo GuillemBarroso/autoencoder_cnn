@@ -14,6 +14,7 @@ def loadData_testing(testingData):
         checkScale(data, [0, 255])
         if not testingData['colour'][i]:
             data.rgb2greyScale()
+            data.blackAndWhite()
         checkDim(data, testingData['resolution'][i])
         checkChannels(data, testingData['resolution'][i])
         checkScale(data, [0,1])

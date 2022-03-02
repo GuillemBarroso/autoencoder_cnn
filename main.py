@@ -10,6 +10,7 @@ if __name__ == '__main__':
     data = Data(dataset,verbose=True, saveInfo=True)
     data.load()
     data.rgb2greyScale()
+    data.blackAndWhite()
     model = Model(data,verbose=True, saveInfo=True)
     model.build(nConvBlocks=2, nFilters=[30, 60], kernelSize= [3, 3], stride=2)
     model.compile(optimizer='adam', loss='mean_squared_error')
