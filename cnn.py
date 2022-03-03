@@ -118,69 +118,6 @@ class CNN():
         self.buildTime = stop - start
         summary()
 
-    def compile(self,optimizer='adam', loss='mean_squared_error'):
-        def summary():
-            data = [['nConvBlocks', self.nConvBlocks],
-            ['optimizer', self.optimizer],
-            ['loss function', self.loss],
-            ['compile time', '{:.2}s'.format(self.compileTime)]]
-            name = 'results/compileModel_{}.png'.format(self.data.dataset)
-            summaryInfo(data, self.verbose, self.saveInfo, name)
-
-        assert isinstance(optimizer, str), '"optimizer" must be a string'
-        assert isinstance(loss, str), '"loss" must be a string'
-        start = timeit.default_timer()
-        self.optimizer = optimizer
-        self.loss = loss
-        self.autoencoder.compile(optimizer=self.optimizer, loss=self.loss)
-
-        stop = timeit.default_timer()
-        self.compileTime = stop - start
-        summary()
-        if self.verbose:
-            self.autoencoder.summary()
-
-    def train(self, epochs=50, nBatch=32, earlyStopPatience=10, earlyStopTol=10e-4):
-        assert isinstance(epochs, int), '"epochs" must be an integer'
-        assert isinstance(nBatch, int), '"nBatch" must be an integer'
-        assert isinstance(earlyStopPatience, int), '"earlyStopPatience" must be an integer'
-        assert isinstance(earlyStopTol, float), '"earlyStopTol" must be a float'
-        start = timeit.default_timer()
-        self.epochs = epochs
-        self.nBatch = nBatch
-        self.earlyStopPatience = earlyStopPatience
-        earlyStop = keras.callbacks.EarlyStopping(patience=self.earlyStopPatience,monitor='val_loss',
-                                                  restore_best_weights=True, min_delta=earlyStopTol)
-        self.history = self.autoencoder.fit(self.data.x_train, self.data.x_train, epochs=self.epochs,
-                                       batch_size=self.nBatch, shuffle=True,
-                                       validation_data=(self.data.x_val, self.data.x_val), verbose=self.verbose,
-                                       callbacks=[earlyStop])
-
-        self.min_loss = min(self.history.history['loss'])
-        self.min_valLoss = min(self.history.history['val_loss'])
-        stop = timeit.default_timer()
-        self.trainTime = stop - start
-        if self.verbose:
-            plotTraining(self.history, self.trainTime)
-
-        ## TODO: save model and load saved models
-
-    def predict(self):
-        def summary():
-            data = [['epochs', self.epochs],
-            ['nBatch', self.nBatch],
-            ['early stop patience', '{} epochs'.format(self.earlyStopPatience)],
-            ['training time', '{:.2}s'.format(self.trainTime)],
-            ['min training loss', '{:.2}'.format(self.min_loss)],
-            ['min validation loss', '{:.2}'.format(self.min_valLoss)],
-            ['test loss evaluation', '{:.2}'.format(self.test_loss)]]
-            name = 'results/compileModel_{}.png'.format(self.data.dataset)
-            summaryInfo(data, self.verbose, self.saveInfo, name)
-        self.predictions = self.autoencoder.predict(self.data.x_test)
-        self.test_loss = self.autoencoder.evaluate(self.data.x_test, self.data.x_test, verbose=self.verbose)
-        self.code = self.encoder.predict(self.data.x_test)
-        summary()
-
     class Encoder():
         def __init__(self, model, input):
             self.input = input

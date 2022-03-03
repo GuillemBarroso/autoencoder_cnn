@@ -1,7 +1,6 @@
 from training_data import Data
-from cnn_model import CNN
-import numpy as np
-import pytest
+from cnn import CNN
+from model import Model
 
 ## TODO: Add unit testing using pytest
 ## TODO: Refactor with autoencoder_cnn and test folders
@@ -32,14 +31,15 @@ def train_testing(testingData):
             data.rgb2greyScale()
 
         try:
-            model = CNN(data)
+            cnn = CNN(data)
         except Exception as e:
             raise ValueError('Failed when creating model. {}'.format(e))
         try:
-            model.build(nConvBlocks=1,nFilters=1, kernelSize=1, stride=2)
+            cnn.build(nConvBlocks=1,nFilters=1, kernelSize=1, stride=2)
         except Exception as e:
             raise ValueError('Failed when building model. {}'.format(e))
         try:
+            model = Model(cnn)
             model.compile(optimizer='adam',loss='mean_squared_error')
         except Exception as e:
             raise ValueError('Failed when compiling model. {}'.format(e))

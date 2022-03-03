@@ -1,9 +1,7 @@
 from training_data import Data
-from fcnn_model import FCNN
+from fcnn import FCNN
 from model import Model
 from postprocessing import plottingPrediction
-import matplotlib.pyplot as plt
-import numpy as np
 
 
 if __name__ == '__main__':
