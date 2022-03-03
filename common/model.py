@@ -1,8 +1,8 @@
 from tensorflow import keras
+from common.postprocessing import summaryInfo
 import timeit
-from common.postprocessing import plotTraining, summaryInfo
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 class Model():
     def __init__(self,nn):
@@ -62,7 +62,14 @@ class Model():
         stop = timeit.default_timer()
         self.trainTime = stop - start
         if self.nn.verbose:
-            plotTraining(self.history, self.trainTime)
+            plt.plot(self.history.epoch, self.history.history['loss'])
+            plt.plot([x + 1 for x in self.history.epoch], self.history.history['val_loss'])
+            plt.title('Model loss. Training time = {:.2}min'.format(self.trainTime/60))
+            plt.ylabel('loss')
+            plt.xlabel('epoch')
+            plt.legend(['training', 'validation'], loc='upper right')
+            plt.savefig('results/{}_training.png'.format(self.nn.data.dataset))
+            plt.show()
 
         ## TODO: save model and load saved models
 

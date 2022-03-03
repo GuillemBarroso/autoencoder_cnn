@@ -35,16 +35,8 @@ def plottingPrediction(data, model, numDisplay):
         plt.gray()
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
-    plt.show()
-
-
-def plotTraining(history, trainTime):
-    plt.plot(history.epoch, history.history['loss'])
-    plt.plot([x + 1 for x in history.epoch], history.history['val_loss'])
-    plt.title('Model loss. Training time = {:.2}min'.format(trainTime/60))
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['training', 'validation'], loc='upper right')
+    if model.nn.verbose:
+        plt.savefig('results/{}_prediction.png'.format(data.dataset))
     plt.show()
 
 
