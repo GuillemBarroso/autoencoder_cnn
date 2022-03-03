@@ -1,16 +1,16 @@
 # Autoencoders with CNNs
 
-## 1. "mnist" dataset
+## 1. "beam" dataset
 
 ### Training, validation and testing datasets
 
-<img src="./results/mnist_loadData.png" width="30%" height="30%" />
+<img src="./results/beam_loadData_readme.png" width="30%" height="30%" />
 
 ### Building and compiling model
 
 <p float="left">
-  <img src="./results/mnist_buildModel.png" width="30%" height="30%" />
-  <img src="./results/mnist_compileModel.png" width="30%" height="30%" />
+  <img src="./results/beam_buildModel_readme.png" width="30%" height="30%" />
+  <img src="./results/beam_compileModel_readme.png" width="30%" height="30%" />
 </p>
 
 
@@ -19,8 +19,8 @@
 Training parameters and loss functions obtained durig training.
 
 <p float="left">
-  <img src="./results/mnist_trainModel.png" width="30%" height="30%" />
-  <img src="./results/mnist_trainingLoss.png" width="50%" height="50%" />
+  <img src="./results/beam_trainModel_readme.png" width="30%" height="30%" />
+  <img src="./results/beam_training_readme.png" width="50%" height="50%" />
 </p>
 
 ### Prediction results
@@ -29,45 +29,4 @@ Results obtained using the autoencoder. First row corresponds to the original
 image and second row are the recevered image after being passed through
 the autoencoder.
 
-<img src="./results/mnist_testResults.png" width="100%" height="100%" />
-
-### Code visulaisation
-
-The code is the condensed information after the input image is passed throguh the 
-encoder. In this example the code has a shape (7x7x10) and can be visualised in the 
-figure below. Each row corresponds to the 10 filters (columns) of each of the 5 images
-shown in the figure above (7, 2, 1, 0 and 4).
-
-<img src="./results/mnist_code.png" width="100%" height="100%" />
-
-
-## 2. "afreightdata" dataset
-
-### Training, validation and testing datasets
-
-<img src="./results/afreight_loadData.png" width="30%" height="30%" />
-
-
-### Building and compiling model
-
-<p float="left">
-  <img src="./results/afreight_buildModel.png" width="30%" height="30%" />
-  <img src="./results/afreight_compileModel.png" width="30%" height="30%" />
-</p>
-
-### Autoencoder training
-
-Training parameters and loss functions obtained durig training.
-
-<p float="left">
-  <img src="./results/afreight_trainModel.png" width="30%" height="30%" />
-  <img src="./results/afreight_trainingLoss.png" width="50%" height="50%" />
-</p>
-
-### Prediction results
-
-Results obtained using the autoencoder. First row corresponds to the original
-image and second row are the recevered image after being passed through
-the autoencoder.
-
-<img src="./results/afreight_testResults.png" width="100%" height="100%" />
+<img src="./results/beam_prediction_readme.png" width="100%" height="100%" />

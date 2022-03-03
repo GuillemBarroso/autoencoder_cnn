@@ -4,10 +4,13 @@ __pycache__/
 Icon?
 /.vscode
 
-#results/*
-#!results/loadData_beam_show.png
-#!results/buildModel_beam_show.png
-#!results/compileModel_beam_show.png
+results/*
+!results/loadData_beam_readme.png
+!results/buildModel_beam_readme.png
+!results/compileModel_beam_readme.png
+!results/trainModel_beam_readme.png
+!results/beam_training_readme.png
+!results/beam_prediction_readme.png
 
 /datasets/afreightdata
 /datasets/trunk
