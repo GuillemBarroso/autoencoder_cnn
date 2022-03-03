@@ -155,3 +155,8 @@ class Data():
             self.x_test  = np.where(self.x_test > threshold, 1, 0)
         else:
             print('BlackAndWhite method only supported for greyScale images. Since dataset is coloured this option has been neglected.')
+
+    def rehsapeDataToArray(self):
+        self.x_train = self.x_train.reshape(self.nTrain,self.dimension)
+        self.x_val = self.x_val.reshape(self.nVal,self.dimension)
+        self.x_test = self.x_test.reshape(self.nTest,self.dimension)
