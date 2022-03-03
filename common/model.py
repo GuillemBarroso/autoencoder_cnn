@@ -1,6 +1,6 @@
 from tensorflow import keras
 import timeit
-from postprocessing import plotTraining, summaryInfo
+from common.postprocessing import plotTraining, summaryInfo
 import numpy as np
 
 

@@ -1,9 +1,9 @@
-/afreightdata
 .DS_Store
 /.idea/*
-/__pycache__/*
+__pycache__/
 Icon?
 /.vscode
-/trunk
-/trunk_test
-/beam
+/datasets/afreightdata
+/datasets/trunk
+/datasets/trunk_test
+/datasets/beam

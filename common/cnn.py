@@ -1,8 +1,7 @@
 from tensorflow import keras
 from tensorflow.keras import layers
 import timeit
-from prettytable import PrettyTable
-from postprocessing import plotTraining, summaryInfo
+from common.postprocessing import summaryInfo
 import tensorflow.keras.backend as K
 import numpy as np
 

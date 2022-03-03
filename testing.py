@@ -1,9 +1,8 @@
-from training_data import Data
-from cnn import CNN
-from model import Model
+from common.training_data import Data
+from common.cnn import CNN
+from common.model import Model
 
 ## TODO: Add unit testing using pytest
-## TODO: Refactor with autoencoder_cnn and test folders
 
 def loadData_testing(testingData):
     print('TESTING DATA LOADING:')

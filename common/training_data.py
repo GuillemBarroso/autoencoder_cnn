@@ -5,7 +5,7 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 import os, os.path
 import timeit
-from postprocessing import summaryInfo
+from common.postprocessing import summaryInfo
 
 class Data():
     def __init__(self, dataset, testSize=0.1, verbose=False, saveInfo=False):
@@ -65,7 +65,7 @@ class Data():
             self.resolution = (self.x_train[0].shape[0], self.x_train[0].shape[1], 1)
             self.dimension = np.prod(self.resolution[0:2])
         else:
-            self.dirPath = './{}'.format(self.dataset)
+            self.dirPath = './datasets/{}'.format(self.dataset)
             if existsDirectory():
                 self.x_train, self.x_val, self.x_test = self.loadImagesFromDir()
             else:

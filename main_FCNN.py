@@ -1,7 +1,7 @@
-from training_data import Data
-from fcnn import FCNN
-from model import Model
-from postprocessing import plottingPrediction
+from common.training_data import Data
+from common.fcnn import FCNN
+from common.model import Model
+from common.postprocessing import plottingPrediction
 
 
 if __name__ == '__main__':
