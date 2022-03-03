@@ -1,7 +1,7 @@
 from tensorflow import keras
 from tensorflow.keras import layers
-import timeit
 from common.postprocessing import summaryInfo
+import timeit
 import tensorflow.keras.backend as K
 import numpy as np
 
@@ -9,23 +9,12 @@ import numpy as np
 class CNN():
     def __init__(self, data, verbose=False, saveInfo=False):
         self.buildTime = None
-        self.compileTime = None
-        self.trainTime = None
         self.autoencoder = None
         self.encoder = None
-        self.predictions = None
         self.nConvBlocks = None
         self.nFilters = None
         self.stride = None
         self.kernelSize = None
-        self.optimizer = None
-        self.loss = None
-        self.epochs = None
-        self.nBatch = None
-        self.history = None
-        self.min_loss = None
-        self.min_valLoss = None
-        self.test_loss = None
         self.red_res = None
         self.nTrainParam = None
         self.nNonTrainParam = None
@@ -41,7 +30,8 @@ class CNN():
 
     def build(self, nConvBlocks=1, codeSize=36, nFilters=10, kernelSize=3, stride=2):
         def summary():
-            data = [['nConvBlocks', self.nConvBlocks],
+            data = [['NN arch', 'Convolutional'],
+            ['nConvBlocks', self.nConvBlocks],
             ['nFilters', self.nFilters],
             ['kernelSize', self.kernelSize],
             ['stride size', self.stride],

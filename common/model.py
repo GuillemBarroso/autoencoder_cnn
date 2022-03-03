@@ -40,8 +40,9 @@ class Model():
         self.epochs = epochs
         self.nBatch = nBatch
         self.earlyStopPatience = earlyStopPatience
+        self.earlyStopTol = earlyStopTol
         earlyStop = keras.callbacks.EarlyStopping(patience=self.earlyStopPatience,monitor='val_loss',
-                                                  restore_best_weights=True, min_delta=earlyStopTol)
+                                                  restore_best_weights=True, min_delta=self.earlyStopTol)
         self.history = self.nn.autoencoder.fit(self.nn.data.x_train, self.nn.data.x_train, epochs=self.epochs,
                                        batch_size=self.nBatch, shuffle=True,
                                        validation_data=(self.nn.data.x_val, self.nn.data.x_val),
@@ -66,11 +67,14 @@ class Model():
         def summary():
             data = [['epochs', self.epochs],
             ['nBatch', self.nBatch],
+            ['early stop tol', '{:.0e}'.format(self.earlyStopTol)],
             ['early stop patience', '{} epochs'.format(self.earlyStopPatience)],
             ['training time', '{:.2}s'.format(self.trainTime)],
             ['min training loss', '{:.2}'.format(self.min_loss)],
             ['min validation loss', '{:.2}'.format(self.min_valLoss)],
-            ['test loss evaluation', '{:.2}'.format(self.test_loss)]]
+            ['test loss evaluation', '{:.2}'.format(self.test_loss)],
+            ['real code size', self.codeRealSize],
+            ['avg pixel code mag', '{:.2}'.format(self.averageCodeMagnitude)]]
             name = 'results/compileModel_{}.png'.format(self.nn.data.dataset)
             summaryInfo(data, self.nn.verbose, self.nn.saveInfo, name)
 
