@@ -7,7 +7,7 @@ import tensorflow.keras.backend as K
 import numpy as np
 
 
-class Model():
+class CNN():
     def __init__(self, data, verbose=False, saveInfo=False):
         self.buildTime = None
         self.compileTime = None

@@ -1,5 +1,5 @@
 from training_data import Data
-from cnn_model import Model
+from cnn_model import CNN
 import numpy as np
 import pytest
 
@@ -32,7 +32,7 @@ def train_testing(testingData):
             data.rgb2greyScale()
 
         try:
-            model = Model(data)
+            model = CNN(data)
         except Exception as e:
             raise ValueError('Failed when creating model. {}'.format(e))
         try:
