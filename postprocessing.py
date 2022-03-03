@@ -7,6 +7,12 @@ import dataframe_image as dfi
 def plottingPrediction(data, model, numDisplay):
     if numDisplay > data.x_test.shape[0]:
         numDisplay = data.x_test.shape[0]
+    
+    if not data.x_test.shape == data.resolution:
+        data.x_test = data.x_test.reshape(data.nTest, data.resolution[0],data.resolution[1],data.resolution[2])
+        model.predictions = model.predictions.reshape(data.nTest, data.resolution[0],data.resolution[1],data.resolution[2])
+
+    plt.figure(figsize=(20, 4))
     for i in range(numDisplay):
         # Display original
         ax = plt.subplot(3, numDisplay, i + 1)
@@ -16,7 +22,7 @@ def plottingPrediction(data, model, numDisplay):
         ax.get_yaxis().set_visible(False)
 
         # Display code
-        codeSizeSqrt = int(np.sqrt(model.codeSize))
+        codeSizeSqrt = int(np.sqrt(model.nn.codeSize))
         ax = plt.subplot(3, numDisplay, i + 1 + numDisplay)
         plt.imshow(model.code[i].reshape(codeSizeSqrt,codeSizeSqrt))
         plt.gray()
