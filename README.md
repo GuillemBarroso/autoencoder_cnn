@@ -4,13 +4,13 @@
 
 ### Training, validation and testing datasets
 
-<img src="./results/loadData_beam_readme.png" width="60%" height="60%" />
+<img src="./results/loadData_beam_readme.png" width="50%" height="50%" />
 
 ### Building and compiling model
 
 <p float="left">
-  <img src="./results/buildModel_beam_readme.png" width="60%" height="60%" />
-  <img src="./results/compileModel_beam_readme.png" width="60%" height="60%" />
+  <img src="./results/buildModel_beam_readme.png" width="50%" height="50%" />
+  <img src="./results/compileModel_beam_readme.png" width="50%" height="50%" />
 </p>
 
 
@@ -19,7 +19,7 @@
 Training parameters and loss functions obtained durig training.
 
 <p float="left">
-  <img src="./results/trainModel_beam_readme.png" width="60%" height="60%" />
+  <img src="./results/trainModel_beam_readme.png" width="50%" height="50%" />
   <img src="./results/beam_training_readme.png" width="100%" height="100%" />
 </p>
 
