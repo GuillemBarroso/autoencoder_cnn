@@ -19,6 +19,14 @@ class Model():
         self.nn = nn
 
     def compile(self,optimizer='adam', loss='mean_squared_error'):
+        def summary():
+            data = [['nConvBlocks', self.nConvBlocks],
+            ['optimizer', self.optimizer],
+            ['loss function', self.loss],
+            ['compile time', '{:.2}s'.format(self.compileTime)]]
+            name = 'results/compileModel_{}.png'.format(self.data.dataset)
+            summaryInfo(data, self.verbose, self.saveInfo, name)
+
         assert isinstance(optimizer, str), '"optimizer" must be a string'
         assert isinstance(loss, str), '"loss" must be a string'
         start = timeit.default_timer()
@@ -28,6 +36,7 @@ class Model():
 
         stop = timeit.default_timer()
         self.compileTime = stop - start
+        summary()
         if self.nn.verbose:
             self.nn.autoencoder.summary()
 
@@ -75,7 +84,7 @@ class Model():
             ['test loss evaluation', '{:.2}'.format(self.test_loss)],
             ['real code size', self.codeRealSize],
             ['avg pixel code mag', '{:.2}'.format(self.averageCodeMagnitude)]]
-            name = 'results/compileModel_{}.png'.format(self.nn.data.dataset)
+            name = 'results/trainModel_{}.png'.format(self.nn.data.dataset)
             summaryInfo(data, self.nn.verbose, self.nn.saveInfo, name)
 
         self.predictions = self.nn.autoencoder.predict(self.nn.data.x_test)

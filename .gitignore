@@ -3,6 +3,12 @@
 __pycache__/
 Icon?
 /.vscode
+
+#results/*
+#!results/loadData_beam_show.png
+#!results/buildModel_beam_show.png
+#!results/compileModel_beam_show.png
+
 /datasets/afreightdata
 /datasets/trunk
 /datasets/trunk_test

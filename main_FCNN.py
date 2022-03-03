@@ -5,7 +5,7 @@ from common.postprocessing import plottingPrediction
 
 
 if __name__ == '__main__':
-    dataset = 'beam'
+    dataset = 'mnist'
     plotPredictions = True
 
     data = Data(dataset, verbose=True, saveInfo=True)
@@ -15,11 +15,11 @@ if __name__ == '__main__':
     data.rehsapeDataToArray()
 
     fcnn = FCNN(data,verbose=True, saveInfo=True)
-    fcnn.build(codeSize=25, nNeurons=40, nHidLayers=2, regularisation=1e-4)
+    fcnn.build(codeSize=9, nNeurons=20, nHidLayers=1, regularisation=1e-4)
 
     model = Model(fcnn)
     model.compile(optimizer='adam', loss='mean_squared_error')
-    model.train(epochs=10, nBatch=16, earlyStopPatience=50, earlyStopTol=10e-5)
+    model.train(epochs=500, nBatch=16, earlyStopPatience=50, earlyStopTol=10e-5)
     model.predict()
 
     nDisplay = 5
