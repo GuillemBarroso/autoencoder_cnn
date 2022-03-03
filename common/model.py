@@ -20,12 +20,11 @@ class Model():
 
     def compile(self,optimizer='adam', loss='mean_squared_error'):
         def summary():
-            data = [['nConvBlocks', self.nConvBlocks],
-            ['optimizer', self.optimizer],
+            data = [['optimizer', self.optimizer],
             ['loss function', self.loss],
             ['compile time', '{:.2}s'.format(self.compileTime)]]
-            name = 'results/compileModel_{}.png'.format(self.data.dataset)
-            summaryInfo(data, self.verbose, self.saveInfo, name)
+            name = 'results/compileModel_{}.png'.format(self.nn.data.dataset)
+            summaryInfo(data, self.nn.verbose, self.nn.saveInfo, name)
 
         assert isinstance(optimizer, str), '"optimizer" must be a string'
         assert isinstance(loss, str), '"loss" must be a string'
