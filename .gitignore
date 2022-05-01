@@ -16,3 +16,10 @@ results/*
 /datasets/trunk
 /datasets/trunk_test
 /datasets/beam
+/datasets/beam_ext
+/datasets/beam_1F
+/datasets/beam_homog
+/datasets/beam_homog_small
+/datasets/beam_homog_txt
+/datasets/beam_simp
+/datasets/beam_simp_small

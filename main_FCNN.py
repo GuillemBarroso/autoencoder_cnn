@@ -3,19 +3,25 @@ from common.fcnn import FCNN
 from common.model import Model
 from common.postprocessing import plottingPrediction
 
+import matplotlib.pyplot as plt
+import os
+
 
 if __name__ == '__main__':
-    dataset = 'beam'
-    plotPredictions = True
+    # dataset = 'afreightdata'
+    dataset = 'beam_homog_txt'
+    plotPredictions = True              
 
     data = Data(dataset, verbose=True, saveInfo=True)
     data.load()
-    data.rgb2greyScale()
-    data.blackAndWhite()
+    # plt.imshow(data.x_test[0])
+    # data.rgb2greyScale()
+    # plt.imshow(data.x_test[0])
+
     data.rehsapeDataToArray()
 
     fcnn = FCNN(data,verbose=True, saveInfo=True)
-    fcnn.build(codeSize=9, nNeurons=40, nHidLayers=2, regularisation=1e-4)
+    fcnn.build(codeSize=25, nNeurons=20, nHidLayers=4, regularisation=1e-4)
 
     model = Model(fcnn)
     model.compile(optimizer='adam', loss='mean_squared_error')

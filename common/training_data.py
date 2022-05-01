@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split
 import os, os.path
 import timeit
 from common.postprocessing import summaryInfo
+from common.read_txt import Mesh, TxtData
+
 
 class Data():
     def __init__(self, dataset, testSize=0.1, verbose=False, saveInfo=False):
@@ -13,12 +15,14 @@ class Data():
         self.x_train = None
         self.dimension = None
         self.resolution = None
+        self.format = None
         self.scale = None
         self.nTrain = None
         self.nTest = None
         self.nVal = None
         self.dirPath = None
         self.summary = None
+        self.mesh = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
         assert isinstance(testSize, (int,float)), '"testSize" variable must be an integer or a float'
@@ -36,11 +40,13 @@ class Data():
             return os.path.isdir(self.dirPath)
 
         def scale():
-            self.x_train = self.x_train.astype('float32') / 255.
-            self.x_val = self.x_val.astype('float32') / 255.
-            self.x_test = self.x_test.astype('float32') / 255.
-            self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
-                          max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
+            tol = 1e-10
+            if tol > (self.scale[0] - 0) and tol > (self.scale[1] - 1):
+                self.x_train = self.x_train.astype('float32') / 255.
+                self.x_val = self.x_val.astype('float32') / 255.
+                self.x_test = self.x_test.astype('float32') / 255.
+                self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
+                    max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
 
         def getDataSize():
             self.nTrain = self.x_train.shape[0]
@@ -64,6 +70,7 @@ class Data():
             self.x_train, self.x_val = train_test_split(np.asarray(self.x_train), test_size=0.1, shuffle=False)
             self.resolution = (self.x_train[0].shape[0], self.x_train[0].shape[1], 1)
             self.dimension = np.prod(self.resolution[0:2])
+            self.scale = (self.x_train.min(), self.x_train.max())
         else:
             self.dirPath = './datasets/{}'.format(self.dataset)
             if existsDirectory():
@@ -84,10 +91,14 @@ class Data():
             i = 0
             while findImageData and i <= len(imgList):
                 try:
-                    array = self.openImageToArray(imgList[i], isFirst=True)
+                    _ = self.openImageToArray(imgList[i], isFirst=True)
                     findImageData = False
-                except:
+                except Exception as e:
+                    if self.verbose:
+                        print('Error when reading images for the first time. Error: {}'.format(e))
                     i += 1
+            if findImageData:
+                raise ValueError('First valid image not found!')
 
         imgList = os.listdir(self.dirPath)
         findFirstValidFile(imgList)
@@ -98,7 +109,8 @@ class Data():
             try:  # Try so it accepts having other files or folders that are not images inside the same directory
                 array = self.openImageToArray(imgName)
                 assert self.checkImageSize(array), 'Images with different sizes'
-                assert self.checkChannels(), 'Some images are coloured and some are grey-scale'
+                assert self.checkChannels(), 'Images with different number of channels'
+                assert self.checkFormat(imgName), 'Images with different formats'
                 data.append(array)
             except Exception as e:
                 if self.verbose:
@@ -111,20 +123,54 @@ class Data():
 
     def openImageToArray(self, imgName, isFirst=None):
         assert isinstance(imgName, str)
+        if self.getFormat(imgName) == 'png':
+            array = self.readPNG(imgName, isFirst)
+        elif self.getFormat(imgName) == 'txt':
+            array = self.readTXT(imgName, isFirst)
+        else:
+            raise ValueError('Invalid format. Implemented image formats are PNG and TXT')
+        return array
+    
+    def readPNG(self, imgName, isFirst):
         img = Image.open('{}/{}'.format(self.dirPath, imgName))
+        array = np.asarray(img.getdata()).reshape(self.resolution)
         if isFirst:
             self.resolution = (img.height, img.width, self.getChannels(img))
-            self.dimension = np.prod(self.resolution[0:2])
-        return np.asarray(img.getdata()).reshape(self.resolution)
+            self.format = self.getFormat(imgName)
+            self.updateDimension()
+            self.scale = (array.min(), array.max())
+        return array
+
+    def readTXT(self, imgName, isFirst):
+        if isFirst:
+            self.mesh = Mesh()
+            self.mesh.getMesh(self.dataset)
+
+        fileObj = TxtData(self.mesh)
+        values = fileObj.extractValuesFromFile(imgName)
+        array = fileObj.computePixelsFromP0values(values)
+
+        if isFirst:        
+            self.resolution = array.shape
+            self.format = self.getFormat(imgName)
+            self.updateDimension()
+            self.scale = (array.min(), array.max())
+        return array
 
     def getChannels(self, image):
-        if image.mode == 'L':
+        if image.mode == 'L' or image.mode == 'P':
             channels = 1
         elif image.mode == 'RGB':
             channels = 3
+        elif image.mode == 'RGBA':
+            channels = 4
         else:
-            raise ValueError('Image mode not implemented (for now only "L" and "RGB")')
+            raise ValueError('Image mode not implemented (for now only "L", "RGB" and "RBGA")')
         return channels
+
+    def getFormat(self, name):
+        assert isinstance(name, str)
+        return name[name.rfind('.')+1:]
 
     def checkImageSize(self, image):
         self.assertNdarray(image)
@@ -133,16 +179,25 @@ class Data():
     def checkChannels(self):
         return self.resolution[2]
 
+    def checkFormat(self, imgName):
+        assert isinstance(imgName, str)
+        return self.getFormat(imgName) == self.format
+
+    def updateDimension(self):
+        self.dimension = np.prod(self.resolution)
+
     def assertNdarray(self, array):
         assert type(array).__module__ == np.__name__
 
     def rgb2greyScale(self):
         rgb_weights = [0.2989, 0.5870, 0.1140]
-        if self.resolution[2] == 3:
-            self.x_train = np.dot(self.x_train[:], rgb_weights)
-            self.x_val = np.dot(self.x_val[:], rgb_weights)
-            self.x_test = np.dot(self.x_test[:], rgb_weights)
+        if self.resolution[2] == 3 or self.resolution[2] == 4:
+            self.x_train = np.dot(self.x_train[:,:,:,:3], rgb_weights)
+            self.x_val = np.dot(self.x_val[:,:,:,:3], rgb_weights)
+            self.x_test = np.dot(self.x_test[:,:,:,:3], rgb_weights)
             self.resolution = (self.resolution[0], self.resolution[1], 1)
+            self.updateDimension()
+            
         elif self.resolution[2] == 1:
             print('Image already in grey scale')
         else:
@@ -153,6 +208,8 @@ class Data():
             self.x_train  = np.where(self.x_train > threshold, 1, 0)
             self.x_val  = np.where(self.x_val > threshold, 1, 0)
             self.x_test  = np.where(self.x_test > threshold, 1, 0)
+            self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
+                    max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
         else:
             print('BlackAndWhite method only supported for greyScale images. Since dataset is coloured this option has been neglected.')
 

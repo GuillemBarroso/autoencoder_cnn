@@ -13,9 +13,10 @@ def loadData_testing(testingData):
         if not testingData['colour'][i]:
             data.rgb2greyScale()
             data.blackAndWhite()
+            checkScale(data, [0,1])
         checkDim(data, testingData['resolution'][i])
         checkChannels(data, testingData['resolution'][i])
-        checkScale(data, [0,1])
+        
         print('Data loaded correctly for "{}" dataset'.format(dataset))
     print('\n')
 

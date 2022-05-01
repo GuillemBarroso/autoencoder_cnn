@@ -5,13 +5,13 @@ from common.postprocessing import plottingPrediction
 
 
 if __name__ == '__main__':
-    dataset = 'beam'
+    dataset = 'beam_homog_txt'
     plotPredictions = True
 
     data = Data(dataset,verbose=True, saveInfo=True)
     data.load()
-    data.rgb2greyScale()
-    data.blackAndWhite()
+    # data.rgb2greyScale()
+    # data.blackAndWhite()
 
     cnn = CNN(data,verbose=True, saveInfo=True)
     cnn.build(nConvBlocks=2, nFilters=[10, 20], kernelSize= [3, 3], stride=2)
