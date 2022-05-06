@@ -80,7 +80,7 @@ CNN architecture for the `beam_homog_x4` dataset
 - Transposed conv layer with 20 filters, kernel 3 and stride 2 - 80x160x20 - 20x9x20 + 20 = 3620 train params
 - Output layer - 80x160x1 = 12800 neurons - 20x9 + 1 = 181 train params
 
-<img src="./results/buildModelCNN_beam_simp_txt_4_readme.png" width="50%" height="50%" />
+<img src="./results/buildModelCNN_beam_simp_txt_4_readme.png" width="30%" height="30%" />
 
 # Results
 
@@ -88,13 +88,13 @@ CNN architecture for the `beam_homog_x4` dataset
 
 ### Training, validation and testing datasets
 
-<img src="./results/loadData_beam_homog_x4_readme.png" width="50%" height="50%" />
+<img src="./results/loadData_beam_homog_x4_readme.png" width="30%" height="30%" />
 
 ### Building and compiling model
 
 <p float="left">
-  <img src="./results/buildModel_beam_homog_x4_readme.png" width="50%" height="50%" />
-  <img src="./results/compileModel_beam_homog_x4_readme.png" width="50%" height="50%" />
+  <img src="./results/buildModel_beam_homog_x4_readme.png" width="30%" height="30%" />
+  <img src="./results/compileModel_beam_homog_x4_readme.png" width="30%" height="30%" />
 </p>
 
 
@@ -104,7 +104,7 @@ Training parameters and loss functions obtained durig training.
 
 <p float="left">
   <img src="./results/trainModel_beam_homog_x4_readme.png" width="30%" height="30%" />
-  <img src="./results/beam_homog_x4_training_readme.png" width="80%" height="80%" />
+  <img src="./results/beam_homog_x4_training_readme.png" width="60%" height="60%" />
 </p>
 
 ### Prediction results
@@ -122,13 +122,13 @@ information is compressed preserving the accuracy.
 
 ### Training, validation and testing datasets
 
-<img src="./results/loadData_beam_simp_x4_readme.png" width="50%" height="50%" />
+<img src="./results/loadData_beam_simp_x4_readme.png" width="30%" height="30%" />
 
 ### Building and compiling model
 
 <p float="left">
-  <img src="./results/buildModel_beam_simp_x4_readme.png" width="50%" height="50%" />
-  <img src="./results/compileModel_beam_simp_x4_readme.png" width="50%" height="50%" />
+  <img src="./results/buildModel_beam_simp_x4_readme.png" width="30%" height="30%" />
+  <img src="./results/compileModel_beam_simp_x4_readme.png" width="30%" height="30%" />
 </p>
 
 
@@ -137,8 +137,8 @@ information is compressed preserving the accuracy.
 Training parameters and loss functions obtained durig training.
 
 <p float="left">
-  <img src="./results/trainModel_beam_simp_x4_readme.png" width="50%" height="50%" />
-  <img src="./results/beam_simp_x4_training_readme.png" width="100%" height="100%" />
+  <img src="./results/trainModel_beam_simp_x4_readme.png" width="30%" height="30%" />
+  <img src="./results/beam_simp_x4_training_readme.png" width="40%" height="40%" />
 </p>
 
 ### Prediction results
