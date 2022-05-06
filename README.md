@@ -80,7 +80,7 @@ CNN architecture for the `beam_homog_x4` dataset
 - Transposed conv layer with 20 filters, kernel 3 and stride 2 - 80x160x20 - 20x9x20 + 20 = 3620 train params
 - Output layer - 80x160x1 = 12800 neurons - 20x9 + 1 = 181 train params
 
-<img src="./results/buildModelCNN_beam_simp_txt_4_readme.png" width="30%" height="30%" />
+<img src="./results/buildModelCNN_beam_simp_txt_4_readme.png" width="40%" height="40%" />
 
 # Results
 
@@ -88,13 +88,13 @@ CNN architecture for the `beam_homog_x4` dataset
 
 ### Training, validation and testing datasets
 
-<img src="./results/loadData_beam_homog_x4_readme.png" width="30%" height="30%" />
+<img src="./results/loadData_beam_homog_x4_readme.png" width="40%" height="40%" />
 
 ### Building and compiling model
 
 <p float="left">
-  <img src="./results/buildModel_beam_homog_x4_readme.png" width="30%" height="30%" />
-  <img src="./results/compileModel_beam_homog_x4_readme.png" width="30%" height="30%" />
+  <img src="./results/buildModel_beam_homog_x4_readme.png" width="40%" height="40%" />
+  <img src="./results/compileModel_beam_homog_x4_readme.png" width="40%" height="40%" />
 </p>
 
 
@@ -122,13 +122,13 @@ information is compressed preserving the accuracy.
 
 ### Training, validation and testing datasets
 
-<img src="./results/loadData_beam_simp_x4_readme.png" width="30%" height="30%" />
+<img src="./results/loadData_beam_simp_x4_readme.png" width="40%" height="40%" />
 
 ### Building and compiling model
 
 <p float="left">
-  <img src="./results/buildModel_beam_simp_x4_readme.png" width="30%" height="30%" />
-  <img src="./results/compileModel_beam_simp_x4_readme.png" width="30%" height="30%" />
+  <img src="./results/buildModel_beam_simp_x4_readme.png" width="40%" height="40%" />
+  <img src="./results/compileModel_beam_simp_x4_readme.png" width="40%" height="40%" />
 </p>
 
 
@@ -138,7 +138,7 @@ Training parameters and loss functions obtained durig training.
 
 <p float="left">
   <img src="./results/trainModel_beam_simp_x4_readme.png" width="30%" height="30%" />
-  <img src="./results/beam_simp_x4_training_readme.png" width="40%" height="40%" />
+  <img src="./results/beam_simp_x4_training_readme.png" width="60%" height="60%" />
 </p>
 
 ### Prediction results
@@ -150,4 +150,4 @@ image and last row are the recevered image after being passed through
 the autoencoder. The middle row corresponds to the latent space (code) representaion, where the
 information is compressed preserving the accuracy.
 
-<img src="./results/beam_simp_x4_prediction_readme.png" width="200%" height="200%" />
+<img src="./results/beam_simp_x4_prediction_readme.png" width="300%" height="300%" />
