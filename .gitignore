@@ -5,12 +5,12 @@ Icon?
 /.vscode
 
 results/*
-!results/loadData_beam_readme.png
-!results/buildModel_beam_readme.png
-!results/compileModel_beam_readme.png
-!results/trainModel_beam_readme.png
-!results/beam_training_readme.png
-!results/beam_prediction_readme.png
+!results/loadData_beam_homog_x4_readme.png
+!results/buildModel_beam_homog_x4_readme.png
+!results/compileModel_beam_homog_x4_readme.png
+!results/trainModel_beam_homog_x4_readme.png
+!results/beam_homog_x4_training_readme.png
+!results/beam_homog_x4_prediction_readme.png
 
 /datasets/afreightdata
 /datasets/trunk
@@ -25,5 +25,6 @@ results/*
 /datasets/beam_simp
 /datasets/beam_simp_x4
 /datasets/OLD_datasets
-/results*
+/results_*/
+/results.docx
 /vae_test.py
