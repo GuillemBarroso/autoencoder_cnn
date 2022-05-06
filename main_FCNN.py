@@ -9,7 +9,7 @@ import os
 
 if __name__ == '__main__':
     # dataset = 'afreightdata'
-    dataset = 'beam_homog_txt'
+    dataset = 'beam_simp_txt_4'
     plotPredictions = True              
 
     data = Data(dataset, verbose=True, saveInfo=True)
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     data.rehsapeDataToArray()
 
     fcnn = FCNN(data,verbose=True, saveInfo=True)
-    fcnn.build(codeSize=25, nNeurons=20, nHidLayers=4, regularisation=1e-4)
+    fcnn.build(codeSize=25, nNeurons=200, nHidLayers=4, regularisation=1e-4)
 
     model = Model(fcnn)
     model.compile(optimizer='adam', loss='mean_squared_error')

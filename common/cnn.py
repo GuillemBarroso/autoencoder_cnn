@@ -19,16 +19,19 @@ class CNN():
         self.nTrainParam = None
         self.nNonTrainParam = None
         self.codeSize = None
+        self.nHidLayers = None
+        self.nNeurons = None
 
         assert isinstance(data, object), '"data" must be an object'
-        assert isinstance(verbose, bool), '"verbose" must be a string'
+        assert isinstance(verbose, bool), '"verbose" must be a boolean'
         assert isinstance(saveInfo, bool), '"saveInfo" must be a boolean'
 
         self.data = data
         self.verbose = verbose
         self.saveInfo = saveInfo
 
-    def build(self, nConvBlocks=1, codeSize=36, nFilters=10, kernelSize=3, stride=2):
+    def build(self, nConvBlocks=1, codeSize=25, codeRegCoef= 1e-4, nFilters=10, 
+    kernelSize=3, stride=2, nHidLayers=2, nNeurons=100):
         def summary():
             data = [['NN arch', 'Convolutional'],
             ['nConvBlocks', self.nConvBlocks],
@@ -36,6 +39,9 @@ class CNN():
             ['kernelSize', self.kernelSize],
             ['stride size', self.stride],
             ['code size', self.codeSize],
+            ['code regularisation coefficient', self.codeRegCoef],
+            ['num hidden layers', self.nHidLayers],
+            ['num neurons', self.nNeurons],
             ['num trainable param', self.nTrainParam],
             ['num non trainable param', self.nNonTrainParam],
             ['build time', '{:.2}s'.format(self.buildTime)]]
@@ -47,12 +53,18 @@ class CNN():
         self.kernelSize = kernelSize
         self.stride = stride
         self.codeSize = codeSize
+        self.codeRegCoef = codeRegCoef
+        self.nHidLayers = nHidLayers
+        self.nNeurons = nNeurons
 
         def inputCheck():
             assert isinstance(self.nConvBlocks, int), '"nConvBlock" must be an integer'
             assert isinstance(self.nFilters, (list,int)), '"nFilters" must be a a list or an integer'
             assert isinstance(self.kernelSize, (list,int,tuple)), '"kernel" must be an integer or a tuple'
             assert isinstance(self.stride, (int,tuple)), '"stride" must be an integer or a tuple'
+            assert isinstance(self.codeRegCoef, (int,float)), '"codeRegCoef" must be an integer or a float'
+            assert isinstance(self.nHidLayers, int), '"nHidLayers" must be an integer'
+            assert isinstance(self.nNeurons, int), '"nNeurons" must be an integer'
             if isinstance(self.nFilters, list):
                 assert len(self.nFilters) == self.nConvBlocks, '"nFilters" list length must match "nConvBlocks"'
             else:
@@ -78,16 +90,22 @@ class CNN():
         encoded = self.Encoder(self, input)
         encoded = encoded.build()
 
-        # Fully-connected layers to compress information
+        # Fully-connected layers to encode (compress) information
         encoded = layers.Flatten()(encoded)
         nNeuronsDense = self.red_res[0]*self.red_res[1]*self.nFilters[-1]
-        # encoded = layers.Dense(nNeuronsDense*0.1, activation='relu')(encoded)
-        # encoded = layers.Dense(nNeuronsDense*0.01, activation='relu')(encoded)
-        encoded = layers.Dense(self.codeSize, activation='relu')(encoded)
 
-        # decoded = layers.Dense(nNeuronsDense*0.1*0.1, activation='relu')(encoded)
-        # decoded = layers.Dense(nNeuronsDense*0.1, activation='relu')(decoded)
-        decoded = layers.Dense(nNeuronsDense, activation='relu')(encoded)
+        for i in range(self.nHidLayers):
+            encoded = layers.Dense(self.nNeurons, activation='relu')(encoded)
+        
+        # Latent space or code
+        encoded = layers.Dense(self.codeSize, activation='relu',
+            kernel_regularizer=keras.regularizers.L1(l1=self.codeRegCoef))(encoded)
+
+        # Decode information with FC layers
+        decoded = layers.Dense(self.nNeurons, activation='relu')(encoded)
+        for i in range(self.nHidLayers-1):
+            decoded = layers.Dense(self.nNeurons, activation='relu')(decoded)
+        decoded = layers.Dense(nNeuronsDense, activation='relu')(decoded)
         decoded = layers.Reshape((self.red_res[0], self.red_res[1], self.nFilters[-1]))(decoded)
 
         # Decoder
