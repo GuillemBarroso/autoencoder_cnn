@@ -30,7 +30,7 @@ class CNN():
         self.verbose = verbose
         self.saveInfo = saveInfo
 
-    def build(self, nConvBlocks=1, codeSize=25, codeRegCoef= 1e-4, nFilters=10, 
+    def build(self, nConvBlocks=1, codeSize=25, regularisation= 1e-4, nFilters=10, 
     kernelSize=3, stride=2, nHidLayers=2, nNeurons=100):
         def summary():
             data = [['NN arch', 'Convolutional'],
@@ -39,7 +39,7 @@ class CNN():
             ['kernelSize', self.kernelSize],
             ['stride size', self.stride],
             ['code size', self.codeSize],
-            ['code regularisation coefficient', self.codeRegCoef],
+            ['code layer regularisation', self.regularisation],
             ['num hidden layers', self.nHidLayers],
             ['num neurons', self.nNeurons],
             ['num trainable param', self.nTrainParam],
@@ -53,7 +53,7 @@ class CNN():
         self.kernelSize = kernelSize
         self.stride = stride
         self.codeSize = codeSize
-        self.codeRegCoef = codeRegCoef
+        self.regularisation = regularisation
         self.nHidLayers = nHidLayers
         self.nNeurons = nNeurons
 
@@ -62,7 +62,7 @@ class CNN():
             assert isinstance(self.nFilters, (list,int)), '"nFilters" must be a a list or an integer'
             assert isinstance(self.kernelSize, (list,int,tuple)), '"kernel" must be an integer or a tuple'
             assert isinstance(self.stride, (int,tuple)), '"stride" must be an integer or a tuple'
-            assert isinstance(self.codeRegCoef, (int,float)), '"codeRegCoef" must be an integer or a float'
+            assert isinstance(self.regularisation, (int,float)), '"regularisation" must be an integer or a float'
             assert isinstance(self.nHidLayers, int), '"nHidLayers" must be an integer'
             assert isinstance(self.nNeurons, int), '"nNeurons" must be an integer'
             if isinstance(self.nFilters, list):
@@ -99,7 +99,7 @@ class CNN():
         
         # Latent space or code
         encoded = layers.Dense(self.codeSize, activation='relu',
-            kernel_regularizer=keras.regularizers.L1(l1=self.codeRegCoef))(encoded)
+            kernel_regularizer=keras.regularizers.L1(l1=self.regularisation))(encoded)
 
         # Decode information with FC layers
         decoded = layers.Dense(self.nNeurons, activation='relu')(encoded)

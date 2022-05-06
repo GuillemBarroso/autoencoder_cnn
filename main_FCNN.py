@@ -8,16 +8,11 @@ import os
 
 
 if __name__ == '__main__':
-    # dataset = 'afreightdata'
-    dataset = 'beam_simp_txt_4'
+    dataset = 'beam_homog_test'
     plotPredictions = True              
 
     data = Data(dataset, verbose=True, saveInfo=True)
     data.load()
-    # plt.imshow(data.x_test[0])
-    # data.rgb2greyScale()
-    # plt.imshow(data.x_test[0])
-
     data.rehsapeDataToArray()
 
     fcnn = FCNN(data,verbose=True, saveInfo=True)
@@ -25,7 +20,7 @@ if __name__ == '__main__':
 
     model = Model(fcnn)
     model.compile(optimizer='adam', loss='mean_squared_error')
-    model.train(epochs=500, nBatch=16, earlyStopPatience=50, earlyStopTol=10e-8)
+    model.train(epochs=500, nBatch=16, earlyStopPatience=50, earlyStopTol=1e-8)
     model.predict()
 
     nDisplay = 5

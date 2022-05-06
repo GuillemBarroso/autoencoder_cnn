@@ -19,7 +19,11 @@ results/*
 /datasets/beam_ext
 /datasets/beam_1F
 /datasets/beam_homog
-/datasets/beam_homog_small
-/datasets/beam_homog_txt
+/datasets/beam_homog_x2
+/datasets/beam_homog_x4
+/datasets/beam_homog_x8
 /datasets/beam_simp
-/datasets/beam_simp_small
+/datasets/beam_simp_x4
+/datasets/OLD_datasets
+/results*
+/vae_test.py
