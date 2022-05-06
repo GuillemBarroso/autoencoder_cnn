@@ -11,6 +11,14 @@ results/*
 !results/trainModel_beam_homog_x4_readme.png
 !results/beam_homog_x4_training_readme.png
 !results/beam_homog_x4_prediction_readme.png
+!results/buildModelFCNN_beam_homog_x4_readme.png
+!results/buildModelCNN_beam_simp_txt_4_readme.png
+!results/loadData_beam_simp_x4_readme.png
+!results/buildModel_beam_simp_x4_readme.png
+!results/compileModel_beam_simp_x4_readme.png
+!results/trainModel_beam_simp_x4_readme.png
+!results/beam_simp_x4_training_readme.png
+!results/beam_simp_x4_prediction_readme.png
 
 /datasets/afreightdata
 /datasets/trunk

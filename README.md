@@ -4,9 +4,9 @@
 
 Each dataset is defined by its directory name and is located in the `datasets` folder.
 
-Each dataset must contain all images for trainind, validation and testing.
+Each dataset must contain all images for training, validation and testing.
 
-Implemented inputs are:
+Implemented input formats are:
 
 * PNG images
 
@@ -34,7 +34,7 @@ Implemented inputs are:
 
     2. `xxx.txt` files with element values (solution with P0, constant values in each element). This files must be all related to the same mesh in `Th.msh`
 
-        | 1st column     | 2n column      | 3rd column  | 4th column  | 5th column  | 
+        | 1st column     | 2n column      | 3rd column  | ...  | nth column  | 
         | ------------- | ------------- | --------    | --------    | --------    |
         | nElems        |          |    |
         | u_1         | u_2         | u_3   | u_4   | u_5   |
@@ -42,7 +42,7 @@ Implemented inputs are:
         | ...         | ...         | ...   | ...   | u_nElems   |
          
 
-### FCNN
+## FCNN model
 
 FCNN architecture for the `beam_homog_x4` dataset
 
@@ -60,7 +60,7 @@ FCNN architecture for the `beam_homog_x4` dataset
 
 <img src="./results/buildModelFCNN_beam_homog_x4_readme.png" width="50%" height="50%" />
 
-### CNN
+## CNN model
 
 CNN architecture for the `beam_homog_x4` dataset
 
@@ -84,7 +84,7 @@ CNN architecture for the `beam_homog_x4` dataset
 
 # Results
 
-## 1. "beam_homog_x4" dataset
+## 1. "beam_homog_x4" dataset using a FCNN
 
 ### Training, validation and testing datasets
 
@@ -103,8 +103,8 @@ CNN architecture for the `beam_homog_x4` dataset
 Training parameters and loss functions obtained durig training.
 
 <p float="left">
-  <img src="./results/trainModel_beam_homog_x4_readme.png" width="50%" height="50%" />
-  <img src="./results/beam_homog_x4_training_readme.png" width="100%" height="100%" />
+  <img src="./results/trainModel_beam_homog_x4_readme.png" width="30%" height="30%" />
+  <img src="./results/beam_homog_x4_training_readme.png" width="80%" height="80%" />
 </p>
 
 ### Prediction results
@@ -117,3 +117,37 @@ the autoencoder. The middle row corresponds to the latent space (code) represent
 information is compressed preserving the accuracy.
 
 <img src="./results/beam_homog_x4_prediction_readme.png" width="200%" height="200%" />
+
+## 2. "beam_simp_x4" dataset using a CNN
+
+### Training, validation and testing datasets
+
+<img src="./results/loadData_beam_simp_x4_readme.png" width="50%" height="50%" />
+
+### Building and compiling model
+
+<p float="left">
+  <img src="./results/buildModel_beam_simp_x4_readme.png" width="50%" height="50%" />
+  <img src="./results/compileModel_beam_simp_x4_readme.png" width="50%" height="50%" />
+</p>
+
+
+### Autoencoder training
+
+Training parameters and loss functions obtained durig training.
+
+<p float="left">
+  <img src="./results/trainModel_beam_simp_x4_readme.png" width="50%" height="50%" />
+  <img src="./results/beam_simp_x4_training_readme.png" width="100%" height="100%" />
+</p>
+
+### Prediction results
+
+Results obtained using the autoencoder. 
+
+First row corresponds to the original
+image and last row are the recevered image after being passed through
+the autoencoder. The middle row corresponds to the latent space (code) representaion, where the
+information is compressed preserving the accuracy.
+
+<img src="./results/beam_simp_x4_prediction_readme.png" width="200%" height="200%" />
