@@ -58,7 +58,7 @@ FCNN architecture for the `beam_homog_x4` dataset
 - Hidden layer - 200 neurons - 200*200 + 200 = 40200 train params
 - Output layer - 80x160 = 12800 neurons - 12800*200 + 12800 = 2572800 train params
 
-<img src="./results/buildModelFCNN_beam_homog_x4_readme.png" width="50%" height="50%" />
+<img src="./results/buildModelFCNN_beam_homog_x4_readme.png" width="40%" height="40%" />
 
 ## CNN model
 
