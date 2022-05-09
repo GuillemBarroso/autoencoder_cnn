@@ -3,9 +3,6 @@ from common.fcnn import FCNN
 from common.model import Model
 from common.postprocessing import plottingPrediction
 
-import matplotlib.pyplot as plt
-import os
-
 
 if __name__ == '__main__':
     dataset = 'beam_homog_test'

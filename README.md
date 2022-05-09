@@ -1,6 +1,6 @@
 # Autoencoders in a physical-driven problem
 
-## Inputs
+## Training data
 
 Each dataset is defined by its directory name and is located in the `datasets` folder.
 
@@ -32,7 +32,7 @@ Implemented input formats are:
 
         Thrid a block of length `nBoundEdges` with information of each boundary edge; (node1, node2, boundID).
 
-    2. `xxx.txt` files with element values (solution with P0, constant values in each element). This files must be all related to the same mesh in `Th.msh`
+    2. `fileName.txt` files with element values (solution with P0, constant values in each element). This files must be all related to the same mesh in `Th.msh`
 
         | 1st column     | 2n column      | 3rd column  | ...  | nth column  | 
         | ------------- | ------------- | --------    | --------    | --------    |
@@ -116,6 +116,12 @@ image and last row are the recevered image after being passed through
 the autoencoder. The middle row corresponds to the latent space (code) representaion, where the
 information is compressed preserving the accuracy.
 
+| Layer     | Resolution | Size | Compression rate |
+| ------------- | ------------- | ------------- |  ------------- |
+| Original image |  80x160x1  | 12800 | 1 |
+| Latent space | 5x5    | 25 (only 7 non-zero) | 1800 |
+| Reconstructed image | 80x160x1  | 12800 | 1 |
+
 <img src="./results/beam_homog_x4_prediction_readme.png" width="200%" height="200%" />
 
 ## 2. "beam_simp_x4" dataset using a CNN
@@ -149,5 +155,11 @@ First row corresponds to the original
 image and last row are the recevered image after being passed through
 the autoencoder. The middle row corresponds to the latent space (code) representaion, where the
 information is compressed preserving the accuracy.
+
+| Layer     | Resolution | Size | Compression rate |
+| ------------- | ------------- | ------------- |  ------------- |
+| Original image |  80x160x1  | 12800 | 1 |
+| Latent space | 5x5    | 25 (only 17 non-zero) | 750 |
+| Reconstructed image | 80x160x1  | 12800 | 1 |
 
 <img src="./results/beam_simp_x4_prediction_readme.png" width="300%" height="300%" />
