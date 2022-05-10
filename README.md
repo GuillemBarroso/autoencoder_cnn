@@ -51,9 +51,9 @@ FCNN architecture for the `beam_homog_x4` dataset
 - Hidden layer - 200 neurons - 200*200 + 200 = 40200 train params
 - Hidden layer - 200 neurons - 200*200 + 200 = 40200 train params
 - Hidden layer - 200 neurons - 200*200 + 200 = 40200 train params
-- Latent space (code) - max size 25 = 25*200 + 25 = 5025 train params
-- Hidden layer - 200 neurons = 200*25 + 200 = 5200 train params
-- Hidden layer - 200 neurons = 200*200 + 200 = 40200 train params
+- Latent space (code) - max size 25 - 25*200 + 25 = 5025 train params
+- Hidden layer - 200 neurons - 200*25 + 200 = 5200 train params
+- Hidden layer - 200 neurons - 200*200 + 200 = 40200 train params
 - Hidden layer - 200 neurons - 200*200 + 200 = 40200 train params
 - Hidden layer - 200 neurons - 200*200 + 200 = 40200 train params
 - Output layer - 80x160 = 12800 neurons - 12800*200 + 12800 = 2572800 train params

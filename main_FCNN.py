@@ -2,14 +2,27 @@ from common.training_data import Data
 from common.fcnn import FCNN
 from common.model import Model
 from common.postprocessing import plottingPrediction
+# import pyvista as pv
+# import numpy as np  
+# import vtk
 
 
 if __name__ == '__main__':
     dataset = 'beam_homog_test'
-    plotPredictions = True              
+    plotPredictions = True
+
+    # mesh = pv.read('Fh0_Fv1_R0.vtk')
+    
+    # reader = vtk.vtkDataSetReader()
+    # reader.SetFileName("lh.sulc.fundi.from.pits.pial.vtk")
+    # reader.ReadAllScalarsOn()  # Activate the reading of all scalars
+    # reader.Update()
+
+    # data=reader.GetOutput()
 
     data = Data(dataset, verbose=True, saveInfo=True)
     data.load()
+    data.preThresholdFilter(tol=1e-6)
     data.rehsapeDataToArray()
 
     fcnn = FCNN(data,verbose=True, saveInfo=True)

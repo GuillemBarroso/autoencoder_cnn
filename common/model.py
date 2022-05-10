@@ -71,7 +71,7 @@ class Model():
             plt.savefig('results/{}_training.png'.format(self.nn.data.dataset))
             plt.show()
 
-        ## TODO: save model and load saved models
+        ## TODO: add option to save model and load saved models
 
     def predict(self):
         def getCodeInfo():
@@ -94,8 +94,10 @@ class Model():
             summaryInfo(data, self.nn.verbose, self.nn.saveInfo, name)
 
         self.predictions = self.nn.autoencoder.predict(self.nn.data.x_test)
+        # TODO: Add filter to predictions!
         self.test_loss = self.nn.autoencoder.evaluate(
             self.nn.data.x_test, self.nn.data.x_test, verbose=self.nn.verbose)
+        # TODO: compute error with postprocess filter
         self.code = self.nn.encoder.predict(self.nn.data.x_test)
         getCodeInfo()
         summary()

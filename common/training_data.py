@@ -39,15 +39,6 @@ class Data():
         def existsDirectory():
             return os.path.isdir(self.dirPath)
 
-        def scale():
-            tol = 1e-10
-            if tol > (self.scale[0] - 0) and tol > (self.scale[1] - 1):
-                self.x_train = self.x_train.astype('float32') / 255.
-                self.x_val = self.x_val.astype('float32') / 255.
-                self.x_test = self.x_test.astype('float32') / 255.
-                self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
-                    max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
-
         def getDataSize():
             self.nTrain = self.x_train.shape[0]
             self.nTest = self.x_test.shape[0]
@@ -81,7 +72,7 @@ class Data():
         stop = timeit.default_timer()
         self.loadTime = stop - start
 
-        scale()
+        self.scaleDataset()
         getDataSize()
         summary()
 
@@ -189,6 +180,17 @@ class Data():
     def assertNdarray(self, array):
         assert type(array).__module__ == np.__name__
 
+    def scaleDataset(self):
+            maxVal = max(np.amax(self.x_train), np.amax(self.x_val), np.amax(self.x_test))
+            self.x_train = self.x_train.astype('float32') / maxVal
+            self.x_val = self.x_val.astype('float32') / maxVal
+            self.x_test = self.x_test.astype('float32') / maxVal
+            self.updateScale()
+
+    def updateScale(self):
+        self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
+                max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
+
     def rgb2greyScale(self):
         rgb_weights = [0.2989, 0.5870, 0.1140]
         if self.resolution[2] == 3 or self.resolution[2] == 4:
@@ -208,10 +210,18 @@ class Data():
             self.x_train  = np.where(self.x_train > threshold, 1, 0)
             self.x_val  = np.where(self.x_val > threshold, 1, 0)
             self.x_test  = np.where(self.x_test > threshold, 1, 0)
-            self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
-                    max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
+            self.updateScale()
         else:
             print('BlackAndWhite method only supported for greyScale images. Since dataset is coloured this option has been neglected.')
+
+    def preThresholdFilter(self, tol=1e-8):
+        self.x_train  = np.where(self.x_train < tol, 0, self.x_train)
+        self.x_train  = np.where(self.x_train > 1 - tol, 1, self.x_train)
+        self.x_val  = np.where(self.x_val < tol, 0, self.x_val)
+        self.x_val  = np.where(self.x_val > 1 - tol, 1, self.x_val)
+        self.x_test  = np.where(self.x_test < tol, 0, self.x_test)
+        self.x_test  = np.where(self.x_test > 1 - tol, 1, self.x_test)
+        self.updateScale()
 
     def rehsapeDataToArray(self):
         self.x_train = self.x_train.reshape(self.nTrain,self.dimension)
