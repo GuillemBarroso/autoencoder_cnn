@@ -61,7 +61,7 @@ class Data():
             self.x_train, self.x_val = train_test_split(np.asarray(self.x_train), test_size=0.1, shuffle=False)
             self.resolution = (self.x_train[0].shape[0], self.x_train[0].shape[1], 1)
             self.dimension = np.prod(self.resolution[0:2])
-            self.scale = (self.x_train.min(), self.x_train.max())
+            self.scale = self.getArrayScale(self.x_train)
         else:
             self.dirPath = './datasets/{}'.format(self.dataset)
             if existsDirectory():
@@ -129,7 +129,7 @@ class Data():
             self.resolution = (img.height, img.width, self.getChannels(img))
             self.format = self.getFormat(imgName)
             self.updateDimension()
-            self.scale = (array.min(), array.max())
+            self.scale = self.getArrayScale(array)
         return array
 
     def readTXT(self, imgName, isFirst):
@@ -145,7 +145,7 @@ class Data():
             self.resolution = array.shape
             self.format = self.getFormat(imgName)
             self.updateDimension()
-            self.scale = (array.min(), array.max())
+            self.scale = self.getArrayScale(array)
         return array
 
     def getChannels(self, image):
@@ -190,6 +190,12 @@ class Data():
     def updateScale(self):
         self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
                 max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
+
+    def scaleArray(self, arr):
+        return arr.astype('float32') / np.amax(arr)
+
+    def getArrayScale(self, arr):
+        return (arr.min(), arr.max())
 
     def rgb2greyScale(self):
         rgb_weights = [0.2989, 0.5870, 0.1140]
