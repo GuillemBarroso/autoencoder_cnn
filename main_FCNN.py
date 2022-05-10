@@ -8,7 +8,7 @@ from common.postprocessing import plottingPrediction
 
 
 if __name__ == '__main__':
-    dataset = 'beam_homog_test'
+    dataset = 'beam_homog_x4'
     plotPredictions = True
 
     # mesh = pv.read('Fh0_Fv1_R0.vtk')
@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     data = Data(dataset, verbose=True, saveInfo=True)
     data.load()
-    data.preThresholdFilter(tol=1e-6)
+    data.thresholdFilter(tol=1e-6)
     data.rehsapeDataToArray()
 
     fcnn = FCNN(data,verbose=True, saveInfo=True)

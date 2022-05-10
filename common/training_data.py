@@ -72,7 +72,7 @@ class Data():
         stop = timeit.default_timer()
         self.loadTime = stop - start
 
-        self.scaleDataset()
+        self.normaliseDataset()
         getDataSize()
         summary()
 
@@ -180,19 +180,20 @@ class Data():
     def assertNdarray(self, array):
         assert type(array).__module__ == np.__name__
 
-    def scaleDataset(self):
-            maxVal = max(np.amax(self.x_train), np.amax(self.x_val), np.amax(self.x_test))
-            self.x_train = self.x_train.astype('float32') / maxVal
-            self.x_val = self.x_val.astype('float32') / maxVal
-            self.x_test = self.x_test.astype('float32') / maxVal
-            self.updateScale()
+    def normaliseDataset(self):
+        # maxVal = max(np.amax(self.x_train), np.amax(self.x_val), np.amax(self.x_test))
+        # normalising the 3 datasets differently (normalising each at a time), is that OK? 
+        self.x_train = self.normaliseArray(self.x_train)
+        self.x_val = self.normaliseArray(self.x_val)
+        self.x_test = self.normaliseArray(self.x_test)
+        self.updateScale()
 
     def updateScale(self):
         self.scale = (min(self.x_train.min(), self.x_test.min(), self.x_val.min()),
                 max(self.x_train.max(), self.x_test.max(), self.x_val.max()))
 
-    def scaleArray(self, arr):
-        return arr.astype('float32') / np.amax(arr)
+    def normaliseArray(self, arr):
+        return (arr.astype('float32') - np.amin(arr)) / (np.amax(arr) - np.amin(arr) )
 
     def getArrayScale(self, arr):
         return (arr.min(), arr.max())
@@ -220,14 +221,24 @@ class Data():
         else:
             print('BlackAndWhite method only supported for greyScale images. Since dataset is coloured this option has been neglected.')
 
-    def preThresholdFilter(self, tol=1e-8):
-        self.x_train  = np.where(self.x_train < tol, 0, self.x_train)
-        self.x_train  = np.where(self.x_train > 1 - tol, 1, self.x_train)
-        self.x_val  = np.where(self.x_val < tol, 0, self.x_val)
-        self.x_val  = np.where(self.x_val > 1 - tol, 1, self.x_val)
-        self.x_test  = np.where(self.x_test < tol, 0, self.x_test)
-        self.x_test  = np.where(self.x_test > 1 - tol, 1, self.x_test)
+    def thresholdFilter(self, tol=1e-8):
+
+        limits = [0, 1]
+        self.x_train  = self.thresholdArrayFilter(self.x_train, limits, tol)
+        self.x_val  = self.thresholdArrayFilter(self.x_val, limits, tol)
+        self.x_test  = self.thresholdArrayFilter(self.x_test, limits, tol)
+        # self.x_train  = np.where(self.x_train < tol, 0, self.x_train)
+        # self.x_train  = np.where(self.x_train > 1 - tol, 1, self.x_train)
+        # self.x_val  = np.where(self.x_val < tol, 0, self.x_val)
+        # self.x_val  = np.where(self.x_val > 1 - tol, 1, self.x_val)
+        # self.x_test  = np.where(self.x_test < tol, 0, self.x_test)
+        # self.x_test  = np.where(self.x_test > 1 - tol, 1, self.x_test)
         self.updateScale()
+
+    def thresholdArrayFilter(self, arr, limits, tol):
+        arr = np.where(arr < limits[0] + tol, limits[0], arr)
+        arr = np.where(arr > limits[1] - tol, limits[1], arr)
+        return arr
 
     def rehsapeDataToArray(self):
         self.x_train = self.x_train.reshape(self.nTrain,self.dimension)

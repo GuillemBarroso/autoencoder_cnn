@@ -1,5 +1,6 @@
 from tensorflow import keras
 from common.postprocessing import summaryInfo
+from common.training_data import Data
 import timeit
 import numpy as np
 import matplotlib.pyplot as plt
@@ -94,7 +95,11 @@ class Model():
             summaryInfo(data, self.nn.verbose, self.nn.saveInfo, name)
 
         self.predictions = self.nn.autoencoder.predict(self.nn.data.x_test)
-        # TODO: Add filter to predictions!
+        # Scale 
+        self.predictions = Data(self.nn.data.dataset).normaliseArray(self.predictions)
+        self.predictions = Data(self.nn.data.dataset).thresholdArrayFilter(
+            self.predictions, limits=[0, 1], tol=2e-1)
+
         self.test_loss = self.nn.autoencoder.evaluate(
             self.nn.data.x_test, self.nn.data.x_test, verbose=self.nn.verbose)
         # TODO: compute error with postprocess filter
