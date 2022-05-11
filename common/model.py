@@ -98,7 +98,7 @@ class Model():
         # Scale 
         self.predictions = Data(self.nn.data.dataset).normaliseArray(self.predictions)
         self.predictions = Data(self.nn.data.dataset).thresholdArrayFilter(
-            self.predictions, limits=[0, 1], tol=2e-1)
+            self.predictions, limits=[0, 1], tol=4e-1)
 
         self.test_loss = self.nn.autoencoder.evaluate(
             self.nn.data.x_test, self.nn.data.x_test, verbose=self.nn.verbose)

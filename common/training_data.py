@@ -10,7 +10,7 @@ from common.read_txt import Mesh, TxtData
 
 
 class Data():
-    def __init__(self, dataset, testSize=0.1, verbose=False, saveInfo=False):
+    def __init__(self, dataset, testData=0.1, verbose=False, saveInfo=False):
         self.x_test = None
         self.x_train = None
         self.dimension = None
@@ -23,14 +23,16 @@ class Data():
         self.dirPath = None
         self.summary = None
         self.mesh = None
+        self.imgList = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
-        assert isinstance(testSize, (int,float)), '"testSize" variable must be an integer or a float'
-        assert 0 <= testSize <= 1, 'testSize should be in [0,1]'
+        assert isinstance(testData, (int,float, list)), '"testData" variable must be an integer or a float or a list'
+        if not isinstance(testData, list):
+            assert 0 <= testData <= 1, 'If float, "testData" should be between [0,1]'
         assert isinstance(verbose, bool), '"verbose" variable must be a boolean'
         assert isinstance(saveInfo, bool), '"saveSummary" variable must be a boolean'
 
-        self.testSize = testSize
+        self.testData = testData
         self.dataset = dataset
         self.verbose = verbose
         self.saveInfo = saveInfo
@@ -65,7 +67,7 @@ class Data():
         else:
             self.dirPath = './datasets/{}'.format(self.dataset)
             if existsDirectory():
-                self.x_train, self.x_val, self.x_test = self.loadImagesFromDir()
+                self.loadImagesFromDir()
             else:
                 raise ValueError('Invalid dataset name. "dataset" should be the name of the directory')
 
@@ -91,26 +93,44 @@ class Data():
             if findImageData:
                 raise ValueError('First valid image not found!')
 
-        imgList = os.listdir(self.dirPath)
-        findFirstValidFile(imgList)
+        self.imgList = os.listdir(self.dirPath)
+        findFirstValidFile(self.imgList)
 
         # Loop over images and store them in the proper format
         data = []
-        for imgName in imgList:
+        aux = []
+        for imgName in self.imgList:
             try:  # Try so it accepts having other files or folders that are not images inside the same directory
                 array = self.openImageToArray(imgName)
                 assert self.checkImageSize(array), 'Images with different sizes'
                 assert self.checkChannels(), 'Images with different number of channels'
                 assert self.checkFormat(imgName), 'Images with different formats'
                 data.append(array)
+                aux.append(imgName)
             except Exception as e:
                 if self.verbose:
                     print('Ignoring file when loading from {}. Error: {}'.format(self.dataset, e))
+            self.imgList = aux
 
-        valSize = self.testSize/(1-self.testSize)
-        x_train, x_test = train_test_split(np.asarray(data), test_size=self.testSize, shuffle=False)
-        x_train, x_val = train_test_split(np.asarray(x_train), test_size=valSize, shuffle=True)
-        return x_train, x_val, x_test
+        try:
+            _ = len(self.testData)
+            x_noTest = []
+            x_test = []
+            imageTestList = []
+            for iImage, imgName in enumerate(self.imgList):
+                if imgName in self.testData:
+                    x_test.append(data[iImage])
+                    imageTestList.append(imgName)
+                else:
+                    x_noTest.append(data[iImage])
+
+            self.x_train, self.x_val = train_test_split(np.asarray(x_noTest), test_size=0.1, shuffle=True)
+            self.x_test = np.asarray(x_test)
+
+        except TypeError:
+            valSize = self.testData/(1-self.testData)
+            x_train, self.x_test = train_test_split(np.asarray(data), test_size=self.testData, shuffle=False)
+            self.x_train, self.x_val = train_test_split(np.asarray(x_train), test_size=valSize, shuffle=True)
 
     def openImageToArray(self, imgName, isFirst=None):
         assert isinstance(imgName, str)
