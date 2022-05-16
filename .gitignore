@@ -35,4 +35,8 @@ results/*
 /datasets/OLD_datasets
 /results_*/
 /results.docx
+/results_full.docx
+/results_interp.docx
+/results_interp_small.docx
+/results_extrap.docx
 /vae_test.py

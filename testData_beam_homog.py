@@ -63,10 +63,11 @@ def getParamsFromMus(mu1,mu2):
         pos = mu1
     elif 1.0 <= mu1 < 2.0:
         loc = 'R'
-        pos = 2 - mu1
+        pos = mu1 - 1
     elif 2.0 <= mu1:
         loc = 'T'
         pos = 2 + 1 - 0.1 - mu1
+        pos = 1 - (mu1 + 0.1 - 2)
 
     pos = round(pos, 2)
     if pos == 0.0:
@@ -79,8 +80,9 @@ if __name__ == '__main__':
 
     # Define test images
     datasetSize = 4
+    # mu2_test = [45, 67.5, 90, 112.5, 135]
     mu2_test = [round(x,2) for x in np.arange(0, 202.5, 22.5)]
-    mu1_test = [1.0, 1.05, 1.1, 1.15, 1.2]
+    mu1_test = [2.4, 2.45, 2.5, 2.55, 2.6]
     # mu2_test = [22.5]
     # mu1_test = [2.0, 2.1, 2.2, 2.3]
 

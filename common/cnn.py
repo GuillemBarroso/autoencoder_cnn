@@ -91,6 +91,7 @@ class CNN():
         encoded = encoded.build()
 
         # Fully-connected layers to encode (compress) information
+        # TODO: add nHid layers and nNeurons in summary table
         encoded = layers.Flatten()(encoded)
         nNeuronsDense = self.red_res[0]*self.red_res[1]*self.nFilters[-1]
 
@@ -111,7 +112,7 @@ class CNN():
         # Decoder
         decoded = self.Decoder(self, decoded)
         decoded = decoded.build()
-        decoded = layers.Conv2D(self.data.resolution[2], self.kernelSize[0], activation="sigmoid", padding="same")(decoded)
+        decoded = layers.Conv2D(self.data.resolution[2], self.kernelSize[0], activation="relu", padding="same")(decoded)
 
         # Build autoencoder and encoder (so "code" or "latent vector" is accessible)
         self.autoencoder = keras.Model(input, decoded)

@@ -117,12 +117,17 @@ class Data():
             x_noTest = []
             x_test = []
             imageTestList = []
+
             for iImage, imgName in enumerate(self.imgList):
                 if imgName in self.testData:
                     x_test.append(data[iImage])
                     imageTestList.append(imgName)
                 else:
                     x_noTest.append(data[iImage])
+
+            if len(x_test) != len(self.testData):
+                print('WARNING: number of test images requested is {}. Found {} with the same name in dataset.'.format(
+                    len(self.testData), len(x_test)))
 
             self.x_train, self.x_val = train_test_split(np.asarray(x_noTest), test_size=0.1, shuffle=True)
             self.x_test = np.asarray(x_test)

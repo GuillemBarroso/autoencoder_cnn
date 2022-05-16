@@ -62,7 +62,7 @@ class FCNN():
         decoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal')(encoded)
         for _ in range(nHidLayers-1):
             decoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal')(decoded)
-        decoded = layers.Dense(self.data.dimension)(decoded)
+        decoded = layers.Dense(self.data.dimension, activation='relu')(decoded)
 
         # Create autoencoder and encoder objects
         self.autoencoder = keras.Model(input_img, decoded)
