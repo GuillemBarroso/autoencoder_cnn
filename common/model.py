@@ -75,6 +75,7 @@ class Model():
         ## TODO: add option to save model and load saved models
 
     def predict(self):
+        ## TODO: refactor predict to a different class that makes predictions from a loaded model
         def getCodeInfo():
             avg = np.true_divide(self.code.sum(0), self.code.shape[0])
             self.codeRealSize = np.count_nonzero(avg)
@@ -96,8 +97,8 @@ class Model():
 
         self.predictions = self.nn.autoencoder.predict(self.nn.data.x_test)
         # Scale 
-        self.predictions = Data(self.nn.data.dataset).normaliseArray(self.predictions)
-        self.predictions = Data(self.nn.data.dataset).thresholdArrayFilter(
+        self.predictions = Data(self.nn.data.dataset, self.nn.data.dataMultCoef).normaliseArray(self.predictions)
+        self.predictions = Data(self.nn.data.dataset, self.nn.data.dataMultCoef).thresholdArrayFilter(
             self.predictions, limits=[0, 1], tol=0)
 
         self.test_loss = self.nn.autoencoder.evaluate(

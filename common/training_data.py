@@ -10,7 +10,7 @@ from common.read_txt import Mesh, TxtData
 
 
 class Data():
-    def __init__(self, dataset, testData=0.1, verbose=False, saveInfo=False):
+    def __init__(self, dataset, dataMultCoef=1, testData=0.1, verbose=False, saveInfo=False):
         self.x_test = None
         self.x_train = None
         self.dimension = None
@@ -26,6 +26,8 @@ class Data():
         self.imgList = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
+        assert isinstance(dataMultCoef, int), '"dataMultCoef" variable must be an integer'
+        assert 1 <= dataMultCoef, '"dataMultCoef" must be greater of equal than 1'
         assert isinstance(testData, (int,float, list)), '"testData" variable must be an integer or a float or a list'
         if not isinstance(testData, list):
             assert 0 <= testData <= 1, 'If float, "testData" should be between [0,1]'
@@ -34,6 +36,7 @@ class Data():
 
         self.testData = testData
         self.dataset = dataset
+        self.dataMultCoef = dataMultCoef
         self.verbose = verbose
         self.saveInfo = saveInfo
 
@@ -112,6 +115,9 @@ class Data():
                     print('Ignoring file when loading from {}. Error: {}'.format(self.dataset, e))
             self.imgList = aux
 
+        # Multiply the dataset before selecting test images
+        # data, self.imgList = self.multiplyDatasetBefore(data) 
+
         try:
             _ = len(self.testData)
             x_noTest = []
@@ -136,6 +142,23 @@ class Data():
             valSize = self.testData/(1-self.testData)
             x_train, self.x_test = train_test_split(np.asarray(data), test_size=self.testData, shuffle=False)
             self.x_train, self.x_val = train_test_split(np.asarray(x_train), test_size=valSize, shuffle=True)
+        
+        # Multiply dataset after selecting test/train/val images
+        self.multiplyDatasetAfter()
+
+    def multiplyDatasetBefore(self, data):
+        dataset = []
+        imgNames = []
+        [dataset.append(k) for k in data for _ in range(self.dataMultCoef)]
+        [imgNames.append(k) for k in self.imgList for _ in range(self.dataMultCoef)]
+        return dataset, imgNames
+
+    def multiplyDatasetAfter(self):
+        print(self.x_train.shape)
+        self.x_train = np.tile(self.x_train,(self.dataMultCoef,1,1,1))
+        self.x_val = np.tile(self.x_val,(self.dataMultCoef,1,1,1))
+        self.x_test = np.tile(self.x_test,(self.dataMultCoef,1,1,1))
+
 
     def openImageToArray(self, imgName, isFirst=None):
         assert isinstance(imgName, str)
@@ -239,25 +262,18 @@ class Data():
 
     def blackAndWhite(self,threshold=0.3):
         if self.resolution[2] == 1:
-            self.x_train  = np.where(self.x_train > threshold, 1, 0)
-            self.x_val  = np.where(self.x_val > threshold, 1, 0)
-            self.x_test  = np.where(self.x_test > threshold, 1, 0)
+            self.x_train = np.where(self.x_train > threshold, 1, 0)
+            self.x_val = np.where(self.x_val > threshold, 1, 0)
+            self.x_test = np.where(self.x_test > threshold, 1, 0)
             self.updateScale()
         else:
             print('BlackAndWhite method only supported for greyScale images. Since dataset is coloured this option has been neglected.')
 
     def thresholdFilter(self, tol=1e-8):
-
         limits = [0, 1]
-        self.x_train  = self.thresholdArrayFilter(self.x_train, limits, tol)
-        self.x_val  = self.thresholdArrayFilter(self.x_val, limits, tol)
-        self.x_test  = self.thresholdArrayFilter(self.x_test, limits, tol)
-        # self.x_train  = np.where(self.x_train < tol, 0, self.x_train)
-        # self.x_train  = np.where(self.x_train > 1 - tol, 1, self.x_train)
-        # self.x_val  = np.where(self.x_val < tol, 0, self.x_val)
-        # self.x_val  = np.where(self.x_val > 1 - tol, 1, self.x_val)
-        # self.x_test  = np.where(self.x_test < tol, 0, self.x_test)
-        # self.x_test  = np.where(self.x_test > 1 - tol, 1, self.x_test)
+        self.x_train = self.thresholdArrayFilter(self.x_train, limits, tol)
+        self.x_val = self.thresholdArrayFilter(self.x_val, limits, tol)
+        self.x_test = self.thresholdArrayFilter(self.x_test, limits, tol)
         self.updateScale()
 
     def thresholdArrayFilter(self, arr, limits, tol):

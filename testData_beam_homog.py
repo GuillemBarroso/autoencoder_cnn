@@ -66,8 +66,7 @@ def getParamsFromMus(mu1,mu2):
         pos = mu1 - 1
     elif 2.0 <= mu1:
         loc = 'T'
-        pos = 2 + 1 - 0.1 - mu1
-        pos = 1 - (mu1 + 0.1 - 2)
+        pos = 1 - (mu1 - 2)
 
     pos = round(pos, 2)
     if pos == 0.0:
@@ -79,12 +78,13 @@ def getParamsFromMus(mu1,mu2):
 if __name__ == '__main__':
 
     # Define test images
-    datasetSize = 4
     # mu2_test = [45, 67.5, 90, 112.5, 135]
-    mu2_test = [round(x,2) for x in np.arange(0, 202.5, 22.5)]
-    mu1_test = [2.4, 2.45, 2.5, 2.55, 2.6]
     # mu2_test = [22.5]
-    # mu1_test = [2.0, 2.1, 2.2, 2.3]
+    mu2_test = [round(x,2) for x in np.arange(0, 202.5, 22.5)]
+    mu1_test = [2.5, 2.55, 2.6, 2.65, 2.7]
+    # mu1_test = [2.1, 2.15, 2.2, 2.25, 2.3, 2.35]
+    # mu1_test = [1.0, 1.05, 1.1, 1.15, 1.2, 1.25]
+    # mu1_test = [0.3, 0.35, 0.4, 0.45, 0.5, 0.55]
 
     mu1_ext = []
     mu2_ext = []
@@ -96,25 +96,6 @@ if __name__ == '__main__':
             Fh, Fv, loc, pos = getParamsFromMus(mu1,mu2)
             name = 'Fh{}_Fv{}_{}{}.txt'.format(Fh, Fv, loc, pos)
             testData.append(name)
-            if datasetSize >= 2:
-                for i in range(datasetSize-1):
-                    if i == 0:
-                        addition = ' copy.txt'
-                    else:
-                        addition = ' copy {}.txt'.format(i+1)
-
-                    nameCopy = name[:-4] + addition
-                    testData.append(nameCopy)
-
-    # mu1_test = []
-    # mu2_test = []
-
-    # for testImg in testData:
-    #     # Get info from image
-    #     Fh, Fv, loc, pos = getParamFromStr(testImg)
-    #     mu1, mu2 = getMus(Fh, Fv, loc, pos)
-    #     mu1_test.append(mu1)
-    #     mu2_test.append(mu2)
 
     # Define the parameter's domain
     mu2 = [round(x,2) for x in np.arange(0, 202.5, 22.5)]
@@ -130,7 +111,7 @@ if __name__ == '__main__':
         mu1.append(locRight+1)
     
     for locTop in reversed(muTop):
-        mu1.append(2+(1-locTop-0.1))
+        mu1.append(3 - locTop)
 
     nMu1 = len(mu1)
     nMu2 = len(mu2)

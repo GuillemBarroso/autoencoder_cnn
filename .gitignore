@@ -27,16 +27,6 @@ results/*
 /datasets/beam_ext
 /datasets/beam_1F
 /datasets/beam_homog
-/datasets/beam_homog_x2
-/datasets/beam_homog_x4
-/datasets/beam_homog_x8
-/datasets/beam_simp
-/datasets/beam_simp_x4
 /datasets/OLD_datasets
 /results_*/
-/results.docx
-/results_full.docx
-/results_interp.docx
-/results_interp_small.docx
-/results_extrap.docx
 /vae_test.py

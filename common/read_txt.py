@@ -105,7 +105,7 @@ class TxtData():
         count = 0
         for i in range(self.mesh.nElemsY):
             for j in range(self.mesh.nElemsX):
-                data[i,j] = 0.5*(values[count] + values[count+1])
+                data[-i,j] = 0.5*(values[count] + values[count+1])
                 count += 2
 
         return data

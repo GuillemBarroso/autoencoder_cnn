@@ -112,7 +112,7 @@ class CNN():
         # Decoder
         decoded = self.Decoder(self, decoded)
         decoded = decoded.build()
-        decoded = layers.Conv2D(self.data.resolution[2], self.kernelSize[0], activation="relu", padding="same")(decoded)
+        decoded = layers.Conv2D(self.data.resolution[2], self.kernelSize[0], activation="sigmoid", padding="same")(decoded)
 
         # Build autoencoder and encoder (so "code" or "latent vector" is accessible)
         self.autoencoder = keras.Model(input, decoded)
