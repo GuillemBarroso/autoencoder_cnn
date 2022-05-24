@@ -4,6 +4,7 @@ import pandas as pd
 import dataframe_image as dfi
 
 
+
 def plottingPrediction(data, model, numDisplay):
     if numDisplay > data.x_test.shape[0]:
         numDisplay = data.x_test.shape[0]
@@ -38,6 +39,11 @@ def plottingPrediction(data, model, numDisplay):
     if model.nn.verbose:
         plt.savefig('results/{}_prediction.png'.format(data.dataset))
     plt.show()
+
+    if data.imgTestList:
+        mu1_tot, mu2_tot = data.datasetClass.getMuDomain()
+        data.datasetClass.plotMuDomain(mu1_tot, mu2_tot, data.mu1_test, data.mu2_test)
+
 
 
 def summaryInfo(info, printInfo, saveInfo, name):

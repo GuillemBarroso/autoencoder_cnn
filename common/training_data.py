@@ -7,6 +7,7 @@ import os, os.path
 import timeit
 from common.postprocessing import summaryInfo
 from common.read_txt import Mesh, TxtData
+from common.testData_beam_homog import BeamHomog
 
 
 class Data():
@@ -24,11 +25,15 @@ class Data():
         self.summary = None
         self.mesh = None
         self.imgList = None
+        self.imgTestList = None
+        self.datasetClass = None
+        self.mu1_test = None
+        self.mu2_test = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
         assert isinstance(dataMultCoef, int), '"dataMultCoef" variable must be an integer'
         assert 1 <= dataMultCoef, '"dataMultCoef" must be greater of equal than 1'
-        assert isinstance(testData, (int,float, list)), '"testData" variable must be an integer or a float or a list'
+        assert isinstance(testData, (int,float, list)), '"testData" variable must be an integer, a float or a list'
         if not isinstance(testData, list):
             assert 0 <= testData <= 1, 'If float, "testData" should be between [0,1]'
         assert isinstance(verbose, bool), '"verbose" variable must be a boolean'
@@ -115,19 +120,23 @@ class Data():
                     print('Ignoring file when loading from {}. Error: {}'.format(self.dataset, e))
             self.imgList = aux
 
-        # Multiply the dataset before selecting test images
-        # data, self.imgList = self.multiplyDatasetBefore(data) 
-
         try:
             _ = len(self.testData)
+            
+            if self.dataset == 'beam_homog':
+                self.datasetClass = BeamHomog()
+            else:
+                raise ValueError('Manual test data selection not implemented for this dataset')
+
+            self.testData, self.mu1_test, self.mu2_test = self.datasetClass.getImageNamesFromMus(self.testData[0], self.testData[1])
             x_noTest = []
             x_test = []
-            imageTestList = []
+            self.imgTestList = []
 
             for iImage, imgName in enumerate(self.imgList):
                 if imgName in self.testData:
                     x_test.append(data[iImage])
-                    imageTestList.append(imgName)
+                    self.imgTestList.append(imgName)
                 else:
                     x_noTest.append(data[iImage])
 
@@ -144,21 +153,12 @@ class Data():
             self.x_train, self.x_val = train_test_split(np.asarray(x_train), test_size=valSize, shuffle=True)
         
         # Multiply dataset after selecting test/train/val images
-        self.multiplyDatasetAfter()
+        self.multiplyDatasetSize()
 
-    def multiplyDatasetBefore(self, data):
-        dataset = []
-        imgNames = []
-        [dataset.append(k) for k in data for _ in range(self.dataMultCoef)]
-        [imgNames.append(k) for k in self.imgList for _ in range(self.dataMultCoef)]
-        return dataset, imgNames
-
-    def multiplyDatasetAfter(self):
-        print(self.x_train.shape)
+    def multiplyDatasetSize(self):
         self.x_train = np.tile(self.x_train,(self.dataMultCoef,1,1,1))
         self.x_val = np.tile(self.x_val,(self.dataMultCoef,1,1,1))
         self.x_test = np.tile(self.x_test,(self.dataMultCoef,1,1,1))
-
 
     def openImageToArray(self, imgName, isFirst=None):
         assert isinstance(imgName, str)

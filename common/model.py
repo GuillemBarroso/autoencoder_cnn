@@ -17,6 +17,8 @@ class Model():
         self.min_loss = None
         self.min_valLoss = None
         self.trainTime = None
+        self.test_loss = None
+        self.test_loss_per_image = None
         self.nn = nn
 
     def compile(self,optimizer='adam', loss='mean_squared_error'):
@@ -96,13 +98,20 @@ class Model():
             summaryInfo(data, self.nn.verbose, self.nn.saveInfo, name)
 
         self.predictions = self.nn.autoencoder.predict(self.nn.data.x_test)
-        # Scale 
-        self.predictions = Data(self.nn.data.dataset, self.nn.data.dataMultCoef).normaliseArray(self.predictions)
-        self.predictions = Data(self.nn.data.dataset, self.nn.data.dataMultCoef).thresholdArrayFilter(
-            self.predictions, limits=[0, 1], tol=0)
 
+        # Compute mean error for the entire test dataset
         self.test_loss = self.nn.autoencoder.evaluate(
             self.nn.data.x_test, self.nn.data.x_test, verbose=self.nn.verbose)
+
+        # Get individual errors for each of the test image selected manually
+        self.test_loss_per_image = []
+        if self.nn.data.imgTestList:
+            for i in range(len(self.nn.data.imgTestList)):
+                self.test_loss_per_image.append(
+                    self.nn.autoencoder.evaluate(
+                        self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), 
+                        self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), verbose=self.nn.verbose))
+
         # TODO: compute error with postprocess filter
         self.code = self.nn.encoder.predict(self.nn.data.x_test)
         getCodeInfo()
