@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import math
 
 
 class BeamHomog():
@@ -19,32 +18,34 @@ class BeamHomog():
 
         return mu1, mu2
 
-    # def getParamFromStr(self, name):
-    #     firstUnderscore = name.find('_')
-    #     secondUnderscore = name.find('_',round(len(name)/2))
-    #     Fh = name[2:firstUnderscore]
-    #     Fv = name[firstUnderscore+3:secondUnderscore]
-    #     loc = name[secondUnderscore+1:secondUnderscore+2]
-    #     pos = name[secondUnderscore+2:-4]
-    #     return Fh, Fv, loc, pos
-
-    # def getMus(self, Fh, Fv, loc, pos):
-    #     pos = round(float(pos),2)
-    #     if loc == 'B':
-    #         mu1 = pos
-    #     elif loc == 'R':
-    #         mu1 = 1 - pos + 1
-    #     elif loc == 'T':
-    #         mu1 = 2 + 1 - pos - 0.1
+    def getMusFromParams(self, Fh, Fv, loc, pos):
+        if Fh == 0.0 and Fv == 1.0:
+            mu2 = 0.0
+        elif Fh == 0.382683 and Fv == 0.92388:
+            mu2 = 22.5
+        elif Fh == 0.707107 and Fv == 0.707107:
+            mu2 = 45.0
+        elif Fh == 0.92388 and Fv == 0.382683:
+            mu2 = 67.5
+        elif Fh == 1.0 and Fv == 0.0:
+            mu2 = 90.0
+        elif Fh == 0.92388 and Fv == -0.382683:
+            mu2 = 112.5
+        elif Fh == 0.707107 and Fv == -0.707107:
+            mu2 = 135.0
+        elif Fh == 0.382683 and Fv == -0.92388:
+            mu2 = 157.5
+        elif Fh == 0.0 and Fv == -1.0:
+            mu2 = 180.0
         
-    #     Fh = float(Fh)
-    #     Fv = float(Fv)
+        if loc == 'B':
+            mu1 = pos
+        elif loc == 'R':
+            mu1 = pos + 1
+        elif loc == 'T':
+            mu1 = 3 - pos
 
-    #     h = np.sqrt(Fh**2 + Fv**2)
-    #     rads = math.asin(Fh/h)
-    #     mu2 = round(rads*180/np.pi, 1)
-
-    #     return mu1, mu2
+        return mu1, mu2
 
     def getParamsFromMus(self, mu1, mu2):
         if mu2 == 0.0:
@@ -91,6 +92,16 @@ class BeamHomog():
 
         return Fh, Fv, loc, pos
 
+    def getParamsFromImageName(self, name):
+        # Get indexes of the two underscores
+        underscores = [i for i, ltr in enumerate(name) if ltr == '_']
+        assert len(underscores) == 2, 'Image name with incorrect name. It must contain exactly 2 underscores characters'
+        Fh = float(name[2:underscores[0]])
+        Fv = float(name[underscores[0]+3:underscores[1]])
+        loc = name[underscores[1]+1:underscores[1]+2]
+        pos = float(name[underscores[1]+2:-4])
+        return Fh, Fv, loc, pos
+
     def getImageNamesFromMus(self, mu1_test, mu2_test):
         mu1_ext = []
         mu2_ext = []
@@ -104,7 +115,7 @@ class BeamHomog():
                 testData.append(name)
         return testData, mu1_ext, mu2_ext
 
-    def plotMuDomain(self, mu1_tot, mu2_tot, mu1_test, mu2_test):
+    def plotMuDomain(self, mu1_tot, mu2_tot, mu1_test, mu2_test, verbose=False):
         nMu1 = len(mu1_tot)
         nMu2 = len(mu2_tot)
 
@@ -121,8 +132,11 @@ class BeamHomog():
                             ax.scatter(mu1_tot[i], mu2_tot[j], color='blue')
                     else:
                         ax.scatter(mu1_tot[i], mu2_tot[j], color='blue')
+        ax.set_yticks(mu2_tot)
         plt.xlabel("mu_1 (position)")
         plt.ylabel("mu_2 (angle in º)")
+        if verbose:
+            plt.savefig('results/beam_homog_dataset.png')
         plt.show()
 
 if __name__ == '__main__':

@@ -29,6 +29,7 @@ class Data():
         self.datasetClass = None
         self.mu1_test = None
         self.mu2_test = None
+        self.paramTestList = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
         assert isinstance(dataMultCoef, int), '"dataMultCoef" variable must be an integer'
@@ -132,11 +133,16 @@ class Data():
             x_noTest = []
             x_test = []
             self.imgTestList = []
+            self.paramTestList = [[], []]
 
             for iImage, imgName in enumerate(self.imgList):
                 if imgName in self.testData:
                     x_test.append(data[iImage])
                     self.imgTestList.append(imgName)
+                    Fh, Fv, loc, pos = self.datasetClass.getParamsFromImageName(imgName)
+                    mu1, mu2 = self.datasetClass.getMusFromParams(Fh, Fv, loc, pos)
+                    self.paramTestList[0].append(mu1)
+                    self.paramTestList[1].append(mu2)
                 else:
                     x_noTest.append(data[iImage])
 

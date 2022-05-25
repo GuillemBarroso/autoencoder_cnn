@@ -16,7 +16,6 @@ if __name__ == '__main__':
     
     data = Data(dataset, multCoef, testData=[mu1, mu2], verbose=True, saveInfo=True)
     data.load()
-    # data.thresholdFilter(tol=0)
     data.rehsapeDataToArray()
 
     fcnn = FCNN(data,verbose=True, saveInfo=True)
@@ -27,7 +26,11 @@ if __name__ == '__main__':
     model.train(epochs=500, nBatch=16, earlyStopPatience=50, earlyStopTol=1e-4)
     model.predict()
 
-    nDisplay = 5
+    # imgDisplay = 5
+    mu1_test = [1.0, 1.0, 1.15, 1.25, 1.25]
+    mu2_test = [0, 180, 45, 0, 180]
+    
+    imgDisplay = [mu1_test, mu2_test]
     if plotPredictions:
-        plottingPrediction(data, model, nDisplay)
+        plottingPrediction(data, model, imgDisplay)
 
