@@ -6,10 +6,10 @@ import dataframe_image as dfi
 
 def plottingPrediction(data, model, imgDisplay):
     if isinstance(imgDisplay, int):
-        # Display "random" test images that follow: i+i*i for i in range(numDisplay)
+        # Set test image that will be displayed if the user does not specify them
         numDisplay = imgDisplay
         imgDispList = [a+b*c for a,b,c in zip(range(numDisplay), range(numDisplay), range(numDisplay))]
-        muDispList = [data.mu1_test[imgDispList], data.mu2_test[imgDispList]]
+        muDispList = [[data.paramTestList[0][x] for x in imgDispList], [data.paramTestList[1][x] for x in imgDispList]]
 
     elif isinstance(imgDisplay, list):
         assert len(imgDisplay[0]) == len(imgDisplay[1]), 'mu1_test and mu2_test must have the same length!'

@@ -11,7 +11,7 @@ from common.testData_beam_homog import BeamHomog
 
 
 class Data():
-    def __init__(self, dataset, dataMultCoef=1, testData=0.1, verbose=False, saveInfo=False):
+    def __init__(self, dataset, testData=0.1, verbose=False, saveInfo=False):
         self.x_test = None
         self.x_train = None
         self.dimension = None
@@ -32,8 +32,6 @@ class Data():
         self.paramTestList = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
-        assert isinstance(dataMultCoef, int), '"dataMultCoef" variable must be an integer'
-        assert 1 <= dataMultCoef, '"dataMultCoef" must be greater of equal than 1'
         assert isinstance(testData, (int,float, list)), '"testData" variable must be an integer, a float or a list'
         if not isinstance(testData, list):
             assert 0 <= testData <= 1, 'If float, "testData" should be between [0,1]'
@@ -42,7 +40,6 @@ class Data():
 
         self.testData = testData
         self.dataset = dataset
-        self.dataMultCoef = dataMultCoef
         self.verbose = verbose
         self.saveInfo = saveInfo
 
@@ -157,14 +154,6 @@ class Data():
             valSize = self.testData/(1-self.testData)
             x_train, self.x_test = train_test_split(np.asarray(data), test_size=self.testData, shuffle=False)
             self.x_train, self.x_val = train_test_split(np.asarray(x_train), test_size=valSize, shuffle=True)
-        
-        # Multiply dataset after selecting test/train/val images
-        self.multiplyDatasetSize()
-
-    def multiplyDatasetSize(self):
-        self.x_train = np.tile(self.x_train,(self.dataMultCoef,1,1,1))
-        self.x_val = np.tile(self.x_val,(self.dataMultCoef,1,1,1))
-        self.x_test = np.tile(self.x_test,(self.dataMultCoef,1,1,1))
 
     def openImageToArray(self, imgName, isFirst=None):
         assert isinstance(imgName, str)
