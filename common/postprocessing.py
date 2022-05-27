@@ -72,7 +72,7 @@ def plottingPrediction(data, model, imgDisplay):
     if data.imgTestList:
         mu1_tot, mu2_tot = data.datasetClass.getMuDomain()
         # Plot training and test points
-        data.datasetClass.plotMuDomain(mu1_tot, mu2_tot, data.mu1_test, data.mu2_test, model.nn.verbose)
+        data.datasetClass.plotMuDomain(mu1_tot, mu2_tot, data.paramTestList[0], data.paramTestList[1], model.nn.verbose)
 
         # Plot error for each test point
         fig, ax = plt.subplots()

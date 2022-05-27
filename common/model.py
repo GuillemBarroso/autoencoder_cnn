@@ -104,13 +104,13 @@ class Model():
             self.nn.data.x_test, self.nn.data.x_test, verbose=self.nn.verbose)
 
         # Get individual errors for each of the test image selected manually
+        # TODO: add option NOT to compute test error for each test image (if test dataset is huge?)
         self.test_loss_per_image = []
-        if self.nn.data.imgTestList:
-            for i in range(len(self.nn.data.imgTestList)):
-                self.test_loss_per_image.append(
-                    self.nn.autoencoder.evaluate(
-                        self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), 
-                        self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), verbose=self.nn.verbose))
+        for i in range(len(self.nn.data.imgTestList)):
+            self.test_loss_per_image.append(
+                self.nn.autoencoder.evaluate(
+                    self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), 
+                    self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), verbose=self.nn.verbose))
 
         # TODO: compute error with postprocess filter
         self.code = self.nn.encoder.predict(self.nn.data.x_test)

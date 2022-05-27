@@ -27,8 +27,6 @@ class Data():
         self.imgList = None
         self.imgTestList = None
         self.datasetClass = None
-        self.mu1_test = None
-        self.mu2_test = None
         self.paramTestList = None
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
@@ -118,15 +116,14 @@ class Data():
                     print('Ignoring file when loading from {}. Error: {}'.format(self.dataset, e))
             self.imgList = aux
 
+        if self.dataset == 'beam_homog':
+                self.datasetClass = BeamHomog()
+        else:
+            print('WARNING; no manual test selection implemented for this dataset')
+
         try:
             _ = len(self.testData)
-            
-            if self.dataset == 'beam_homog':
-                self.datasetClass = BeamHomog()
-            else:
-                raise ValueError('Manual test data selection not implemented for this dataset')
-
-            self.testData, self.mu1_test, self.mu2_test = self.datasetClass.getImageNamesFromMus(self.testData[0], self.testData[1])
+            self.testData, _, _ = self.datasetClass.getImageNamesFromMus(self.testData[0], self.testData[1])
             x_noTest = []
             x_test = []
             self.imgTestList = []
@@ -136,10 +133,9 @@ class Data():
                 if imgName in self.testData:
                     x_test.append(data[iImage])
                     self.imgTestList.append(imgName)
-                    Fh, Fv, loc, pos = self.datasetClass.getParamsFromImageName(imgName)
-                    mu1, mu2 = self.datasetClass.getMusFromParams(Fh, Fv, loc, pos)
-                    self.paramTestList[0].append(mu1)
-                    self.paramTestList[1].append(mu2)
+                    mus = self.getMusFromImgName(imgName)
+                    self.paramTestList[0].append(mus[0])
+                    self.paramTestList[1].append(mus[1])
                 else:
                     x_noTest.append(data[iImage])
 
@@ -151,9 +147,22 @@ class Data():
             self.x_test = np.asarray(x_test)
 
         except TypeError:
+            idx = np.arange(len(data))
             valSize = self.testData/(1-self.testData)
-            x_train, self.x_test = train_test_split(np.asarray(data), test_size=self.testData, shuffle=False)
+            x_train, self.x_test, _, idx_test = train_test_split(np.asarray(data), idx, test_size=self.testData, shuffle=True)
             self.x_train, self.x_val = train_test_split(np.asarray(x_train), test_size=valSize, shuffle=True)
+            # Get params for test images
+            self.imgTestList = [self.imgList[x] for x in idx_test]
+            self.paramTestList = [[], []]
+
+            for imgName in self.imgTestList:
+                mus = self.getMusFromImgName(imgName)
+                self.paramTestList[0].append(mus[0])
+                self.paramTestList[1].append(mus[1])
+    
+    def getMusFromImgName(self, imgName):
+        Fh, Fv, loc, pos = self.datasetClass.getParamsFromImageName(imgName)
+        return self.datasetClass.getMusFromParams(Fh, Fv, loc, pos)
 
     def openImageToArray(self, imgName, isFirst=None):
         assert isinstance(imgName, str)
