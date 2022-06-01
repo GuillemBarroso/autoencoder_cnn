@@ -19,6 +19,9 @@ class Model():
         self.trainTime = None
         self.test_loss = None
         self.test_loss_per_image = None
+        self.activeCode = None
+        self.codeRealSize = None
+        self.averageCodeMagnitude = None
         self.nn = nn
 
     def compile(self,optimizer='adam', loss='mean_squared_error'):
@@ -80,7 +83,8 @@ class Model():
         ## TODO: refactor predict to a different class that makes predictions from a loaded model
         def getCodeInfo():
             avg = np.true_divide(self.code.sum(0), self.code.shape[0])
-            self.codeRealSize = np.count_nonzero(avg)
+            self.activeCode = np.nonzero(avg)[0]
+            self.codeRealSize = len(self.activeCode)
             self.averageCodeMagnitude = np.true_divide(avg.sum(),(avg!=0).sum())
 
         def summary():

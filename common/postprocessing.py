@@ -50,6 +50,14 @@ def plottingPrediction(data, model, imgDisplay):
         plt.gray()
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
+        
+        # Draw active code pixels in code plot
+        count = 0
+        for x in range(codeSizeSqrt):
+            for y in range(codeSizeSqrt):
+                if count in model.activeCode:
+                    plt.scatter(x,y, color='red',s=5)
+                count += 1
 
         # Display reconstruction
         ax = plt.subplot(4, numDisplay, i + 1 + 2*numDisplay)

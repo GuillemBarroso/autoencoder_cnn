@@ -29,4 +29,4 @@ results/*
 /datasets/beam_homog
 /datasets/OLD_datasets
 /results_*/
-/vae_test.py
+/*_test.py

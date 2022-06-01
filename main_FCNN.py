@@ -23,18 +23,23 @@ if __name__ == '__main__':
     mu2 = [67.5, 90, 112.5]
     # testData = [mu1, mu2]
     testData = 0.1
+
+    # Load data
     data = Data(dataset, testData=testData, verbose=True, saveInfo=True)
     data.load()
     data.rehsapeDataToArray()
 
+    # Create NN
     fcnn = FCNN(data,verbose=True, saveInfo=True)
     fcnn.build(codeSize=25, nNeurons=200, nHidLayers=4, regularisation=1e-4)
 
+    # Build, compile and train model
     model = Model(fcnn)
     model.compile(optimizer='adam', loss='mean_squared_error')
     model.train(epochs=500, nBatch=12, earlyStopPatience=100, earlyStopTol=1e-4)
     model.predict()
 
+    # Results visualisation
     mu1_test = [1.4, 1.4, 1.45, 1.5, 1.55, 1.55]
     mu2_test = [67.5, 90, 67.5, 112.5, 90, 112.5]
     # imgDisplay = [mu1_test, mu2_test]
