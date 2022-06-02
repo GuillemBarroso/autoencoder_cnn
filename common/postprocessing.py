@@ -9,7 +9,7 @@ def plottingPrediction(data, model, imgDisplay):
         # Set test image that will be displayed if the user does not specify them
         numDisplay = imgDisplay
         imgDispList = [a+b*c for a,b,c in zip(range(numDisplay), range(numDisplay), range(numDisplay))]
-        muDispList = [[data.paramTestList[0][x] for x in imgDispList], [data.paramTestList[1][x] for x in imgDispList]]
+        muDispList = [[data.paramTest[0][x] for x in imgDispList], [data.paramTest[1][x] for x in imgDispList]]
 
     elif isinstance(imgDisplay, list):
         assert len(imgDisplay[0]) == len(imgDisplay[1]), 'mu1_test and mu2_test must have the same length!'
@@ -80,21 +80,21 @@ def plottingPrediction(data, model, imgDisplay):
     if data.imgTestList:
         mu1_tot, mu2_tot = data.datasetClass.getMuDomain()
         # Plot training and test points
-        data.datasetClass.plotMuDomain(mu1_tot, mu2_tot, data.paramTestList[0], data.paramTestList[1], model.nn.verbose)
+        data.datasetClass.plotMuDomain(mu1_tot, mu2_tot, data.paramTest[0], data.paramTest[1], model.nn.verbose)
 
         # Plot error for each test point
         fig, ax = plt.subplots()
         for i in range(len(model.test_loss_per_image)):
             imageError = '{:.2}'.format(model.test_loss_per_image[i])
             
-            indMu1 = [k for k, x in enumerate(muDispList[0]) if x == data.paramTestList[0][i]]
-            if data.paramTestList[1][i] in [muDispList[1][x] for x in indMu1]:
+            indMu1 = [k for k, x in enumerate(muDispList[0]) if x == data.paramTest[0][i]]
+            if data.paramTest[1][i] in [muDispList[1][x] for x in indMu1]:
                 colRef = 'green'
             else:
                 colRef = 'red'
 
-            ax.scatter(data.paramTestList[0][i], data.paramTestList[1][i], color=colRef)
-            ax.text(data.paramTestList[0][i], data.paramTestList[1][i], imageError)
+            ax.scatter(data.paramTest[0][i], data.paramTest[1][i], color=colRef)
+            ax.text(data.paramTest[0][i], data.paramTest[1][i], imageError)
         ax.set_yticks(mu2_tot)
         plt.xlabel("mu_1 (position)")
         plt.ylabel("mu_2 (angle in º)")

@@ -27,7 +27,10 @@ class Data():
         self.imgList = None
         self.imgTestList = None
         self.datasetClass = None
-        self.paramTestList = None
+        self.parametricProblem = None
+        self.paramTrain = [[], []]
+        self.paramVal = [[], []]
+        self.paramTest = [[], []]
 
         assert isinstance(dataset, str), '"dataset" variable must be a string'
         assert isinstance(testData, (int,float, list)), '"testData" variable must be an integer, a float or a list'
@@ -100,9 +103,18 @@ class Data():
         self.imgList = os.listdir(self.dirPath)
         findFirstValidFile(self.imgList)
 
+        # Load extra info from certain datasets (parametric datasets)
+        if self.dataset == 'beam_homog':
+                self.datasetClass = BeamHomog()
+                self.parametricProblem = True
+        else:
+            print('WARNING; no manual test selection implemented for this dataset')
+
         # Loop over images and store them in the proper format
         data = []
         aux = []
+        params = [[], []]
+
         for imgName in self.imgList:
             try:  # Try so it accepts having other files or folders that are not images inside the same directory
                 array = self.openImageToArray(imgName)
@@ -111,54 +123,58 @@ class Data():
                 assert self.checkFormat(imgName), 'Images with different formats'
                 data.append(array)
                 aux.append(imgName)
+
+                if self.datasetClass:
+                    mus = self.getMusFromImgName(imgName)
+                    params[0].append(mus[0])
+                    params[1].append(mus[1])
+
             except Exception as e:
                 if self.verbose:
                     print('Ignoring file when loading from {}. Error: {}'.format(self.dataset, e))
             self.imgList = aux
 
-        if self.dataset == 'beam_homog':
-                self.datasetClass = BeamHomog()
-        else:
-            print('WARNING; no manual test selection implemented for this dataset')
-
-        try:
-            _ = len(self.testData)
+        if isinstance(self.testData, list):
             self.testData, _, _ = self.datasetClass.getImageNamesFromMus(self.testData[0], self.testData[1])
             x_noTest = []
             x_test = []
             self.imgTestList = []
-            self.paramTestList = [[], []]
+            paramNoTest = [[], []]
 
             for iImage, imgName in enumerate(self.imgList):
                 if imgName in self.testData:
                     x_test.append(data[iImage])
                     self.imgTestList.append(imgName)
-                    mus = self.getMusFromImgName(imgName)
-                    self.paramTestList[0].append(mus[0])
-                    self.paramTestList[1].append(mus[1])
+                    self.paramTest[0].append(params[0][iImage])
+                    self.paramTest[1].append(params[1][iImage])
                 else:
                     x_noTest.append(data[iImage])
+                    paramNoTest[0].append(params[0][iImage])
+                    paramNoTest[1].append(params[1][iImage])
 
             if len(x_test) != len(self.testData):
                 print('WARNING: number of test images requested is {}. Found {} with the same name in dataset.'.format(
                     len(self.testData), len(x_test)))
 
-            self.x_train, self.x_val = train_test_split(np.asarray(x_noTest), test_size=0.1, shuffle=True)
+            if self.parametricProblem:
+                self.x_train, self.x_val, self.paramTrain[0], self.paramVal[0], self.paramTrain[1], self.paramVal[1] = train_test_split(
+                    np.asarray(x_noTest),np.asarray(paramNoTest[0]), np.asarray(paramNoTest[1]), test_size=0.1, shuffle=True)
+            else:
+                self.x_train, self.x_val, = train_test_split(np.asarray(x_noTest), test_size=0.1, shuffle=True)
+
             self.x_test = np.asarray(x_test)
 
-        except TypeError:
-            idx = np.arange(len(data))
+        else:
             valSize = self.testData/(1-self.testData)
-            x_train, self.x_test, _, idx_test = train_test_split(np.asarray(data), idx, test_size=self.testData, shuffle=True)
-            self.x_train, self.x_val = train_test_split(np.asarray(x_train), test_size=valSize, shuffle=True)
-            # Get params for test images
-            self.imgTestList = [self.imgList[x] for x in idx_test]
-            self.paramTestList = [[], []]
 
-            for imgName in self.imgTestList:
-                mus = self.getMusFromImgName(imgName)
-                self.paramTestList[0].append(mus[0])
-                self.paramTestList[1].append(mus[1])
+            if self.parametricProblem:
+                self.x_train, self.x_test, self.paramTrain[0], self.paramTest[0], self.paramTrain[1], self.paramTest[1] = train_test_split(
+                    np.asarray(data), np.asarray(params[0]), np.asarray(params[1]), test_size=self.testData, shuffle=True)
+                self.x_train, self.x_val, self.paramTrain[0], self.paramVal[0], self.paramTrain[1], self.paramVal[1] = train_test_split(
+                    self.x_train, self.paramTrain[0], self.paramTrain[1], test_size=valSize, shuffle=True)
+            else:
+                self.x_train, self.x_test = train_test_split(np.asarray(data), test_size=self.testData, shuffle=True)
+                self.x_train, self.x_val = train_test_split(self.x_train, test_size=valSize, shuffle=True)
     
     def getMusFromImgName(self, imgName):
         Fh, Fv, loc, pos = self.datasetClass.getParamsFromImageName(imgName)

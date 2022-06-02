@@ -21,8 +21,8 @@ if __name__ == '__main__':
     # mu2 = [0.0, 22.5, 45, 67.5, 90.0, 112.5, 135.0, 157.5, 180.0]
     # mu2 = [67.5]
     mu2 = [67.5, 90, 112.5]
-    # testData = [mu1, mu2]
-    testData = 0.1
+    testData = [mu1, mu2]
+    # testData = 0.1
 
     # Load data
     data = Data(dataset, testData=testData, verbose=True, saveInfo=True)
@@ -36,14 +36,14 @@ if __name__ == '__main__':
     # Build, compile and train model
     model = Model(fcnn)
     model.compile(optimizer='adam', loss='mean_squared_error')
-    model.train(epochs=500, nBatch=12, earlyStopPatience=100, earlyStopTol=1e-4)
-    model.predict()
+    model.train(epochs=50, nBatch=12, earlyStopPatience=100, earlyStopTol=1e-4)
+    model.predict(indivTestLoss=True)
 
     # Results visualisation
     mu1_test = [1.4, 1.4, 1.45, 1.5, 1.55, 1.55]
     mu2_test = [67.5, 90, 67.5, 112.5, 90, 112.5]
-    # imgDisplay = [mu1_test, mu2_test]
-    imgDisplay = 6
+    imgDisplay = [mu1_test, mu2_test]
+    # imgDisplay = 6
     if plotPredictions:
         plottingPrediction(data, model, imgDisplay)
 

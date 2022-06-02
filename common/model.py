@@ -22,6 +22,7 @@ class Model():
         self.activeCode = None
         self.codeRealSize = None
         self.averageCodeMagnitude = None
+        self.indivTestLoss = None
         self.nn = nn
 
     def compile(self,optimizer='adam', loss='mean_squared_error'):
@@ -79,7 +80,7 @@ class Model():
 
         ## TODO: add option to save model and load saved models
 
-    def predict(self):
+    def predict(self, indivTestLoss=False):
         ## TODO: refactor predict to a different class that makes predictions from a loaded model
         def getCodeInfo():
             avg = np.true_divide(self.code.sum(0), self.code.shape[0])
@@ -101,6 +102,8 @@ class Model():
             name = 'results/trainModel_{}.png'.format(self.nn.data.dataset)
             summaryInfo(data, self.nn.verbose, self.nn.saveInfo, name)
 
+        assert isinstance(indivTestLoss, bool), '"indivTestLoss" must be a boolean'
+        self.indivTestLoss = indivTestLoss
         self.predictions = self.nn.autoencoder.predict(self.nn.data.x_test)
 
         # Compute mean error for the entire test dataset
@@ -108,13 +111,13 @@ class Model():
             self.nn.data.x_test, self.nn.data.x_test, verbose=self.nn.verbose)
 
         # Get individual errors for each of the test image selected manually
-        # TODO: add option NOT to compute test error for each test image (if test dataset is huge?)
-        self.test_loss_per_image = []
-        for i in range(len(self.nn.data.imgTestList)):
-            self.test_loss_per_image.append(
-                self.nn.autoencoder.evaluate(
-                    self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), 
-                    self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), verbose=self.nn.verbose))
+        if self.indivTestLoss:
+            self.test_loss_per_image = []
+            for i in range(self.nn.data.nTest):
+                self.test_loss_per_image.append(
+                    self.nn.autoencoder.evaluate(
+                        self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), 
+                        self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), verbose=self.nn.verbose))
 
         # TODO: compute error with postprocess filter
         self.code = self.nn.encoder.predict(self.nn.data.x_test)
