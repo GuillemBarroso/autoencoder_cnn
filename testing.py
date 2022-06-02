@@ -1,6 +1,6 @@
-from common.training_data import Data
-from common.cnn import CNN
-from common.model import Model
+from src.training_data import Data
+from src.cnn import CNN
+from src.model import Model
 
 ## TODO: Add unit testing using pytest
 

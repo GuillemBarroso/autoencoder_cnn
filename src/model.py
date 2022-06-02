@@ -1,6 +1,6 @@
 from tensorflow import keras
-from common.postprocessing import summaryInfo
-from common.training_data import Data
+from src.postprocessing import summaryInfo
+from src.training_data import Data
 import timeit
 import numpy as np
 import matplotlib.pyplot as plt

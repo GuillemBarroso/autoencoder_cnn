@@ -5,9 +5,9 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 import os, os.path
 import timeit
-from common.postprocessing import summaryInfo
-from common.read_txt import Mesh, TxtData
-from common.testData_beam_homog import BeamHomog
+from src.postprocessing import summaryInfo
+from src.read_txt import Mesh, TxtData
+from src.testData_beam_homog import BeamHomog
 
 
 class Data():

@@ -1,7 +1,7 @@
-from common.training_data import Data
-from common.fcnn import FCNN
-from common.model import Model
-from common.postprocessing import plottingPrediction
+from src.training_data import Data
+from src.fcnn import FCNN
+from src.model import Model
+from src.postprocessing import plottingPrediction
 
 
 if __name__ == '__main__':
@@ -21,8 +21,8 @@ if __name__ == '__main__':
     # mu2 = [0.0, 22.5, 45, 67.5, 90.0, 112.5, 135.0, 157.5, 180.0]
     # mu2 = [67.5]
     mu2 = [67.5, 90, 112.5]
-    testData = [mu1, mu2]
-    # testData = 0.1
+    # testData = [mu1, mu2]
+    testData = 0.1
 
     # Load data
     data = Data(dataset, testData=testData, verbose=True, saveInfo=True)
@@ -42,8 +42,8 @@ if __name__ == '__main__':
     # Results visualisation
     mu1_test = [1.4, 1.4, 1.45, 1.5, 1.55, 1.55]
     mu2_test = [67.5, 90, 67.5, 112.5, 90, 112.5]
-    imgDisplay = [mu1_test, mu2_test]
-    # imgDisplay = 6
+    # imgDisplay = [mu1_test, mu2_test]
+    imgDisplay = 6
     if plotPredictions:
         plottingPrediction(data, model, imgDisplay)
 

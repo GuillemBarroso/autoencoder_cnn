@@ -1,6 +1,6 @@
 from tensorflow import keras
 from tensorflow.keras import layers
-from common.postprocessing import summaryInfo
+from src.postprocessing import summaryInfo
 import timeit
 import tensorflow.keras.backend as K
 import numpy as np
