@@ -8,10 +8,11 @@ import timeit
 from src.postprocessing import summaryInfo
 from src.read_txt import Mesh, TxtData
 from src.testData_beam_homog import BeamHomog
+from src.beam_homog_big import BeamHomogBig
 
 
 class Data():
-    def __init__(self, dataset, testData=0.1, verbose=False, saveInfo=False):
+    def __init__(self, kw):
         self.x_test = None
         self.x_train = None
         self.dimension = None
@@ -32,17 +33,19 @@ class Data():
         self.paramVal = [[], []]
         self.paramTest = [[], []]
 
-        assert isinstance(dataset, str), '"dataset" variable must be a string'
-        assert isinstance(testData, (int,float, list)), '"testData" variable must be an integer, a float or a list'
-        if not isinstance(testData, list):
-            assert 0 <= testData <= 1, 'If float, "testData" should be between [0,1]'
-        assert isinstance(verbose, bool), '"verbose" variable must be a boolean'
-        assert isinstance(saveInfo, bool), '"saveSummary" variable must be a boolean'
+        assert isinstance(kw['DATASET'], str), '"dataset" variable must be a string'
+        assert isinstance(kw['TEST_DATA'], (int,float, list)), '"testData" variable must be an integer, a float or a list'
+        if not isinstance(kw['TEST_DATA'], list):
+            assert 0 <= kw['TEST_DATA'] <= 1, 'If float, "testData" should be between [0,1]'
+        assert isinstance(kw['VERBOSE'], bool), '"verbose" variable must be a boolean'
+        assert isinstance(kw['SAVE_INFO'], bool), '"saveSummary" variable must be a boolean'
+        assert isinstance(kw['ARCH'], str), '"arch" variable must be a string'
 
-        self.testData = testData
-        self.dataset = dataset
-        self.verbose = verbose
-        self.saveInfo = saveInfo
+        self.testData = kw['TEST_DATA']
+        self.dataset = kw['DATASET']
+        self.verbose = kw['VERBOSE']
+        self.saveInfo = kw['SAVE_INFO']
+        self.arch = kw['ARCH']
 
     def load(self):
         def existsDirectory():
@@ -84,6 +87,8 @@ class Data():
         self.normaliseDataset()
         getDataSize()
         summary()
+        if self.arch == 'fcnn':
+            self.rehsapeDataToArray()
 
     def loadImagesFromDir(self):
         def findFirstValidFile(imgList):
@@ -105,8 +110,11 @@ class Data():
 
         # Load extra info from certain datasets (parametric datasets)
         if self.dataset == 'beam_homog':
-                self.datasetClass = BeamHomog()
-                self.parametricProblem = True
+            self.datasetClass = BeamHomog()
+            self.parametricProblem = True
+        elif self.dataset == 'beam_homog_big':
+            self.datasetClass = BeamHomogBig()
+            self.parametricProblem = True
         else:
             print('WARNING; no manual test selection implemented for this dataset')
 
@@ -166,15 +174,17 @@ class Data():
 
         else:
             valSize = self.testData/(1-self.testData)
-
+            idx = range(len(data))
             if self.parametricProblem:
-                self.x_train, self.x_test, self.paramTrain[0], self.paramTest[0], self.paramTrain[1], self.paramTest[1] = train_test_split(
-                    np.asarray(data), np.asarray(params[0]), np.asarray(params[1]), test_size=self.testData, shuffle=True)
+                self.x_train, self.x_test, self.paramTrain[0], self.paramTest[0], self.paramTrain[1], self.paramTest[1], _, idx_test = train_test_split(
+                    np.asarray(data), np.asarray(params[0]), np.asarray(params[1]), idx, test_size=self.testData, shuffle=True)
                 self.x_train, self.x_val, self.paramTrain[0], self.paramVal[0], self.paramTrain[1], self.paramVal[1] = train_test_split(
                     self.x_train, self.paramTrain[0], self.paramTrain[1], test_size=valSize, shuffle=True)
             else:
-                self.x_train, self.x_test = train_test_split(np.asarray(data), test_size=self.testData, shuffle=True)
+                self.x_train, self.x_test, _, idx_test = train_test_split(np.asarray(data), idx, test_size=self.testData, shuffle=True)
                 self.x_train, self.x_val = train_test_split(self.x_train, test_size=valSize, shuffle=True)
+            
+            self.imgTestList = [self.imgList[x] for x in idx_test]
     
     def getMusFromImgName(self, imgName):
         Fh, Fv, loc, pos = self.datasetClass.getParamsFromImageName(imgName)

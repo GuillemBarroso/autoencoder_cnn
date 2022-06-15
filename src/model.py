@@ -46,16 +46,16 @@ class Model():
         if self.nn.verbose:
             self.nn.autoencoder.summary()
 
-    def train(self, epochs=50, nBatch=32, earlyStopPatience=10, earlyStopTol=10e-4):
-        assert isinstance(epochs, int), '"epochs" must be an integer'
-        assert isinstance(nBatch, int), '"nBatch" must be an integer'
-        assert isinstance(earlyStopPatience, int), '"earlyStopPatience" must be an integer'
-        assert isinstance(earlyStopTol, float), '"earlyStopTol" must be a float'
+    def train(self, kw):
+        assert isinstance(kw['EPOCHS'], int), '"epochs" must be an integer'
+        assert isinstance(kw['N_BATCH'], int), '"nBatch" must be an integer'
+        assert isinstance(kw['EARLY_STOP_PATIENCE'], int), '"earlyStopPatience" must be an integer'
+        assert isinstance(kw['EARLY_STOP_TOL'], float), '"earlyStopTol" must be a float'
         start = timeit.default_timer()
-        self.epochs = epochs
-        self.nBatch = nBatch
-        self.earlyStopPatience = earlyStopPatience
-        self.earlyStopTol = earlyStopTol
+        self.epochs = kw['EPOCHS']
+        self.nBatch = kw['N_BATCH']
+        self.earlyStopPatience = kw['EARLY_STOP_PATIENCE']
+        self.earlyStopTol = kw['EARLY_STOP_TOL']
         earlyStop = keras.callbacks.EarlyStopping(patience=self.earlyStopPatience,monitor='val_loss',
                                                   restore_best_weights=True, min_delta=self.earlyStopTol)
         self.history = self.nn.autoencoder.fit(self.nn.data.x_train, self.nn.data.x_train, epochs=self.epochs,
@@ -80,7 +80,7 @@ class Model():
 
         ## TODO: add option to save model and load saved models
 
-    def predict(self, indivTestLoss=False):
+    def predict(self, kw):
         ## TODO: refactor predict to a different class that makes predictions from a loaded model
         def getCodeInfo():
             avg = np.true_divide(self.code.sum(0), self.code.shape[0])
@@ -102,8 +102,8 @@ class Model():
             name = 'results/trainModel_{}.png'.format(self.nn.data.dataset)
             summaryInfo(data, self.nn.verbose, self.nn.saveInfo, name)
 
-        assert isinstance(indivTestLoss, bool), '"indivTestLoss" must be a boolean'
-        self.indivTestLoss = indivTestLoss
+        assert isinstance(kw['INDIV_TEST_LOSS'], bool), '"indivTestLoss" must be a boolean'
+        self.indivTestLoss = kw['INDIV_TEST_LOSS']
         self.predictions = self.nn.autoencoder.predict(self.nn.data.x_test)
 
         # Compute mean error for the entire test dataset
@@ -111,13 +111,20 @@ class Model():
             self.nn.data.x_test, self.nn.data.x_test, verbose=self.nn.verbose)
 
         # Get individual errors for each of the test image selected manually
+        if self.nn.data.arch == 'fcnn':
+            aux = (1, self.nn.data.dimension)
+        elif self.nn.data.arch == 'cnn':
+            aux = (1, self.nn.data.resolution[0], self.nn.data.resolution[1])
+        else:
+            raise ValueError('Check this for other architectures!')
+
         if self.indivTestLoss:
             self.test_loss_per_image = []
             for i in range(self.nn.data.nTest):
                 self.test_loss_per_image.append(
                     self.nn.autoencoder.evaluate(
-                        self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), 
-                        self.nn.data.x_test[i].reshape(1, self.nn.data.dimension), verbose=self.nn.verbose))
+                        self.nn.data.x_test[i].reshape(aux), 
+                        self.nn.data.x_test[i].reshape(aux), verbose=self.nn.verbose))
 
         # TODO: compute error with postprocess filter
         self.code = self.nn.encoder.predict(self.nn.data.x_test)

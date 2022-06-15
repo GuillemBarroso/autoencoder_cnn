@@ -4,7 +4,8 @@ import pandas as pd
 import dataframe_image as dfi
 
 
-def plottingPrediction(data, model, imgDisplay):
+def plottingPrediction(data, model, kw):
+    imgDisplay = kw['IMG_DISPLAY']
     if isinstance(imgDisplay, int):
         # Set test image that will be displayed if the user does not specify them
         numDisplay = imgDisplay
@@ -53,8 +54,8 @@ def plottingPrediction(data, model, imgDisplay):
         
         # Draw active code pixels in code plot
         count = 0
-        for x in range(codeSizeSqrt):
-            for y in range(codeSizeSqrt):
+        for y in range(codeSizeSqrt):
+            for x in range(codeSizeSqrt):  
                 if count in model.activeCode:
                     plt.scatter(x,y, color='red',s=5)
                 count += 1

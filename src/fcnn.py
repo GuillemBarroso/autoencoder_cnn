@@ -48,20 +48,20 @@ class FCNN():
 
         start = timeit.default_timer()
         input_img = keras.Input(shape=(self.data.dimension,))
-        
+        hidReg = 0
         # Encoder
         encoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal')(input_img)
         for _ in range(nHidLayers-1):
-            encoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal')(encoded)
+            encoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal', kernel_regularizer=keras.regularizers.l1(hidReg))(encoded)
         
         # Code
         encoded = layers.Dense(self.codeSize, activation='relu', kernel_initializer='he_normal', 
         kernel_regularizer=keras.regularizers.l1(self.regularisation))(encoded)
         
         # Decoder
-        decoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal')(encoded)
+        decoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal', kernel_regularizer=keras.regularizers.l1(hidReg))(encoded)
         for _ in range(nHidLayers-1):
-            decoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal')(decoded)
+            decoded = layers.Dense(nNeurons, activation='relu', kernel_initializer='he_normal', kernel_regularizer=keras.regularizers.l1(hidReg))(decoded)
         decoded = layers.Dense(self.data.dimension, activation='sigmoid')(decoded)
 
         # Create autoencoder and encoder objects

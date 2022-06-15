@@ -28,5 +28,6 @@ results/*
 /datasets/beam_1F
 /datasets/beam_homog
 /datasets/OLD_datasets
+/datasets/beam_homog_big
 /results_*/
 /*_test.py

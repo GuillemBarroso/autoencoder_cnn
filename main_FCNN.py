@@ -1,13 +1,8 @@
-from src.training_data import Data
-from src.fcnn import FCNN
-from src.model import Model
-from src.postprocessing import plottingPrediction
+from src.run import run
 
 
 if __name__ == '__main__':
-    dataset = 'beam_homog'
-    plotPredictions = True
-
+    
     # Define test data
     # mu1 = [1.0, 1.05, 1.1, 1.15, 1.2, 1.25]
     # mu1 = [0.6, 1.35, 2.2]
@@ -22,28 +17,40 @@ if __name__ == '__main__':
     # mu2 = [67.5]
     mu2 = [67.5, 90, 112.5]
     # testData = [mu1, mu2]
-    testData = 0.1
-
-    # Load data
-    data = Data(dataset, testData=testData, verbose=True, saveInfo=True)
-    data.load()
-    data.rehsapeDataToArray()
-
-    # Create NN
-    fcnn = FCNN(data,verbose=True, saveInfo=True)
-    fcnn.build(codeSize=25, nNeurons=200, nHidLayers=4, regularisation=1e-4)
-
-    # Build, compile and train model
-    model = Model(fcnn)
-    model.compile(optimizer='adam', loss='mean_squared_error')
-    model.train(epochs=50, nBatch=12, earlyStopPatience=100, earlyStopTol=1e-4)
-    model.predict(indivTestLoss=True)
-
     # Results visualisation
     mu1_test = [1.4, 1.4, 1.45, 1.5, 1.55, 1.55]
     mu2_test = [67.5, 90, 67.5, 112.5, 90, 112.5]
-    # imgDisplay = [mu1_test, mu2_test]
-    imgDisplay = 6
-    if plotPredictions:
-        plottingPrediction(data, model, imgDisplay)
+
+    # Parameters
+    VERBOSE = True
+    SAVE_INFO = True
+    PLOT_PRED = True
+    INDIV_TEST_LOSS = True
+
+    DATASET = 'beam_homog_big'
+    TEST_DATA = 0.1
+    # TEST_DATA = [mu1, mu2]
+
+    ARCH = 'fcnn'
+    CODE_SIZE = 25
+    N_NEURONS = 200
+    N_HID_LAY = 4
+    REGULARISATION = 1e-4
+
+    EPOCHS = 500
+    N_BATCH = 12
+    EARLY_STOP_PATIENCE = 100
+    EARLY_STOP_TOL = 1e-4
+    
+    IMG_DISPLAY = 6
+    # IMG_DISPLAY = [mu1_test, mu2_test]
+
+    hyperParams = {'DATASET': DATASET, 'TEST_DATA': TEST_DATA, 'VERBOSE': VERBOSE,
+        'SAVE_INFO':SAVE_INFO , 'ARCH': ARCH, 'CODE_SIZE': CODE_SIZE, 'N_NEURONS': N_NEURONS,
+        'N_HID_LAY': N_HID_LAY, 'REGULARISATION': REGULARISATION, 'EPOCHS': EPOCHS,
+        'N_BATCH': N_BATCH, 'EARLY_STOP_PATIENCE': EARLY_STOP_PATIENCE, 'EARLY_STOP_TOL': EARLY_STOP_TOL,
+        'INDIV_TEST_LOSS': INDIV_TEST_LOSS, 'PLOT_PRED': PLOT_PRED, 'IMG_DISPLAY': IMG_DISPLAY
+    }
+
+    loss = run(**hyperParams)
 
