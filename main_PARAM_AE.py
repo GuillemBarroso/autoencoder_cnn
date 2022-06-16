@@ -39,7 +39,7 @@ if __name__ == '__main__':
     N_HID_LAY_PARAM = 1
     REGULARISATION = 1e-4
 
-    EPOCHS = 300
+    EPOCHS = 20
     N_BATCH = 12
     EARLY_STOP_PATIENCE = 100
     EARLY_STOP_TOL = 1e-4

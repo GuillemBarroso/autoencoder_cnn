@@ -1,6 +1,6 @@
 from tensorflow import keras
 import tensorflow as tf
-from src.postprocessing import summaryInfo
+from src.postprocessing import summaryInfo, plotTraining
 from src.training_data import Data
 import timeit
 import numpy as np
@@ -58,9 +58,9 @@ class ModelNN():
             self.nn.model.autoencoder.add_loss(imageParam_loss)
 
             # Add metrics
-            self.nn.model.autoencoder.add_metric(image_loss, name='image_loss')
-            self.nn.model.autoencoder.add_metric(code_loss, name='code_loss')
-            self.nn.model.autoencoder.add_metric(imageParam_loss, name='imageParam_loss')
+            self.nn.model.autoencoder.add_metric(image_loss, name='L_image_ED')
+            self.nn.model.autoencoder.add_metric(code_loss, name='L_code')
+            self.nn.model.autoencoder.add_metric(imageParam_loss, name='L_image_PD')
 
             coef = self.nn.model.data.dimension/self.nn.model.codeSize
             self.nn.model.autoencoder.summary()
@@ -121,15 +121,16 @@ class ModelNN():
             self.test_loss = self.nn.model.autoencoder.evaluate(
                 self.nn.model.data.x_test, self.nn.model.data.x_test, verbose=self.nn.model.verbose)
 
-        if self.nn.model.verbose:
-            plt.plot(self.history.epoch, self.history.history['loss'])
-            plt.plot([x + 1 for x in self.history.epoch], self.history.history['val_loss'])
-            plt.title('Model loss. Training time = {:.2}min'.format(self.trainTime/60))
-            plt.ylabel('loss')
-            plt.xlabel('epoch')
-            plt.legend(['training', 'validation'], loc='upper right')
-            plt.savefig('results/{}_training.png'.format(self.nn.model.data.dataset))
-            plt.show()
+        if self.nn.model.saveInfo:
+            plotTraining(self.history, self.trainTime, self.nn.model.data.dataset)
+            # plt.plot(self.history.epoch, self.history.history['loss'])
+            # plt.plot([x + 1 for x in self.history.epoch], self.history.history['val_loss'])
+            # plt.title('Model loss. Training time = {:.2}min'.format(self.trainTime/60))
+            # plt.ylabel('loss')
+            # plt.xlabel('epoch')
+            # plt.legend(['training', 'validation'], loc='upper right')
+            # plt.savefig('results/{}_training.png'.format(self.nn.model.data.dataset))
+            # plt.show()
 
         ## TODO: add option to save model and load saved models
 
@@ -173,9 +174,9 @@ class ModelNN():
             ['min training total loss', '{:.2}'.format(self.min_loss)],
             ['min validation total loss', '{:.2}'.format(self.min_valLoss)],
             ['test total loss evaluation', '{:.2}'.format(self.test_loss[0])],
-            ['test image e-d loss evaluation', '{:.2}'.format(self.test_loss[1])],
+            ['test image E-D loss evaluation', '{:.2}'.format(self.test_loss[1])],
             ['test code loss evaluation', '{:.2}'.format(self.test_loss[2])],
-            ['test image p-d loss evaluation', '{:.2}'.format(self.test_loss[3])],
+            ['test image P-D loss evaluation', '{:.2}'.format(self.test_loss[3])],
             ['real code_E size', self.codeRealSize_E],
             ['real code_P size', self.codeRealSize_P],
             ['avg pixel code_E mag', '{:.2}'.format(self.averageCodeMagnitude_E)],

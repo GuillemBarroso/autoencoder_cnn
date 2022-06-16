@@ -18,6 +18,14 @@ def plotImage(data, nRows, numDisplay, count):
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
+def addPlotNames(plotNames):
+    for i, plotName in enumerate(reversed(plotNames)):
+        plt.text(0.1, 0.12+0.23*i, plotName, fontsize=12, transform=plt.gcf().transFigure, rotation=90)
+
+def addPlotNames_param(plotNames):
+    for i, plotName in enumerate(reversed(plotNames)):
+        plt.text(0.1, 0.12+0.14*i, plotName, fontsize=12, transform=plt.gcf().transFigure, rotation=90)
+
 def plotActiveCode(codeSizeSqrt, activeCode):
     count = 0
     for y in range(codeSizeSqrt):
@@ -64,6 +72,7 @@ def plottingPrediction(data, model, kw):
             model.x_PD = model.predictions['x_PD'].reshape(data.nTest, data.resolution[0],data.resolution[1],data.resolution[2])
             nRows = 6
             plt.figure(figsize=(20, 8))
+            plotNames = ['X', 'X_EP', 'code_E', 'code_P', 'X_PD', 'fig data']
             for i in range(numDisplay):
                 # Display NN outputs
                 plotImage(data.x_test[imgDispList[i]], nRows, numDisplay, i+1)
@@ -82,14 +91,15 @@ def plottingPrediction(data, model, kw):
                 ax = plt.subplot(nRows, numDisplay, i + 1 + 5*numDisplay)
                 ax.text(0.15,0.9,'mu1 = {}'.format(muDispList[0][i]))
                 ax.text(0.15,0.7,'mu2 = {}'.format(muDispList[1][i]))
-                ax.text(0.15,0.5,'total loss = {}'.format(total_loss))
-                ax.text(0.15,0.3,'|x_ED - X| = {}'.format(x_ED_loss))
-                ax.text(0.15,0.1,'|code_E - code_P| = {}'.format(code_loss))
-                ax.text(0.15,-0.1,'|x_PD - X| = {}'.format(x_PD_loss))
+                ax.text(0.15,0.5,'L_total = {}'.format(total_loss))
+                ax.text(0.15,0.3,'L_image ED = {}'.format(x_ED_loss))
+                ax.text(0.15,0.1,'L_code = {}'.format(code_loss))
+                ax.text(0.15,-0.1,'L_image_PD = {}'.format(x_PD_loss))
                 ax.axis('off')
-            plt.show()
+            addPlotNames_param(plotNames)
 
         else:
+            plotNames = ['X', 'code', 'X_ED', 'fig data']
             model.predictions = model.predictions.reshape(data.nTest, data.resolution[0],data.resolution[1],data.resolution[2])
             model.code = model.code.reshape(data.nTest, codeSizeSqrt, codeSizeSqrt)
             nRows = 4
@@ -108,9 +118,11 @@ def plottingPrediction(data, model, kw):
                 ax.text(0.15,0.3,'mu2 = {}'.format(muDispList[1][i]))
                 ax.text(0.15,0.1,'loss = {}'.format(imageError))
                 ax.axis('off')
-                if model.nn.model.verbose:
-                    plt.savefig('results/{}_prediction.png'.format(data.dataset))
-            plt.show()
+            addPlotNames(plotNames)
+
+        if model.nn.model.verbose:
+            plt.savefig('results/{}_prediction.png'.format(data.dataset))
+        plt.show()
 
         if data.imgTestList:
             mu1_tot, mu2_tot = data.datasetClass.getMuDomain()
@@ -120,7 +132,10 @@ def plottingPrediction(data, model, kw):
             # Plot error for each test point
             fig, ax = plt.subplots()
             for i in range(len(model.test_loss_per_image)):
-                imageError = '{:.2}'.format(model.test_loss_per_image[i][0])
+                if data.arch == 'param_ae':
+                    imageError = '{:.2}'.format(model.test_loss_per_image[i][0])
+                else:
+                    imageError = '{:.2}'.format(model.test_loss_per_image[i])
                 
                 indMu1 = [k for k, x in enumerate(muDispList[0]) if x == data.paramTest[0][i]]
                 if data.paramTest[1][i] in [muDispList[1][x] for x in indMu1]:
@@ -136,3 +151,15 @@ def plottingPrediction(data, model, kw):
             if model.nn.model.verbose:
                 plt.savefig('results/{}_testError.png'.format(data.dataset))
             plt.show()
+
+def plotTraining(train, trainTime, dataset):
+    leg = []
+    for key in train.history:
+        plt.plot(train.epoch, train.history[key])
+        leg.append(key)
+    plt.title('Model loss. Training time = {:.2} min'.format(trainTime/60))
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.savefig('results/{}_training.png'.format(dataset))
+    plt.legend(leg, loc='upper right')
+    plt.show()

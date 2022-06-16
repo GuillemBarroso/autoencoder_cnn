@@ -64,6 +64,8 @@ class PARAM_AE():
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden2', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden3', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden4', kernel_initializer='he_normal'),
+                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden5', kernel_initializer='he_normal'),
+                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden6', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(25, activation='relu', name='encoder_code',
                 kernel_initializer='he_normal')
             ],
@@ -77,6 +79,8 @@ class PARAM_AE():
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden2', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden3', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden4', kernel_initializer='he_normal'),
+                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden5', kernel_initializer='he_normal'),
+                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden6', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(12800, activation=tf.nn.sigmoid, name='decoder_output_flat', kernel_initializer='he_normal'),
             ],
             name='decoder'
@@ -86,6 +90,7 @@ class PARAM_AE():
         parameter = tf.keras.Sequential(
             [
                 tf.keras.layers.Dense(25, activation='relu', name='param_hidden1', kernel_initializer='he_normal'),
+                tf.keras.layers.Dense(25, activation='relu', name='param_hidden2', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(25, activation='relu', name='param_code',
                 kernel_initializer='he_normal')
             ],
