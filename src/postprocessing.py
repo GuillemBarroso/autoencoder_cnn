@@ -162,4 +162,21 @@ def plotTraining(train, trainTime, dataset):
     plt.xlabel('epoch')
     plt.savefig('results/{}_training.png'.format(dataset))
     plt.legend(leg, loc='upper right')
+    ax = plt.gca()
+    ax.set_ylim([0, 2])
     plt.show()
+
+def getLosses(train, test_loss, dataset, verbose, saveInfo):
+    best_epoch = np.argmin(train.history['loss'])
+    data = []
+    for key in train.history:
+        data.append([key, '{:.2}'.format(train.history[key][best_epoch])])
+    if isinstance(test_loss, list):
+        for i in range(int(len(train.history)/2)):
+            data.append(['test_{}'.format(list(train.history.keys())[i]), '{:.2}'.format(test_loss[i])])
+    else:
+        data.append(['test_loss', '{:.2}'.format(test_loss)])
+  
+    name = 'results/losses_{}.png'.format(dataset)
+    summaryInfo(data, verbose, saveInfo, name)
+    return data

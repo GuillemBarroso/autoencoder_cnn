@@ -1,10 +1,8 @@
 from tensorflow import keras
 import tensorflow as tf
-from src.postprocessing import summaryInfo, plotTraining
-from src.training_data import Data
+from src.postprocessing import summaryInfo, plotTraining, getLosses
 import timeit
 import numpy as np
-import matplotlib.pyplot as plt
 
 class ModelNN():
     def __init__(self,nn):
@@ -108,8 +106,6 @@ class ModelNN():
                                        callbacks=[earlyStop]
             )
 
-        self.min_loss = min(self.history.history['loss'])
-        self.min_valLoss = min(self.history.history['val_loss'])
         stop = timeit.default_timer()
         self.trainTime = stop - start
 
@@ -123,14 +119,9 @@ class ModelNN():
 
         if self.nn.model.saveInfo:
             plotTraining(self.history, self.trainTime, self.nn.model.data.dataset)
-            # plt.plot(self.history.epoch, self.history.history['loss'])
-            # plt.plot([x + 1 for x in self.history.epoch], self.history.history['val_loss'])
-            # plt.title('Model loss. Training time = {:.2}min'.format(self.trainTime/60))
-            # plt.ylabel('loss')
-            # plt.xlabel('epoch')
-            # plt.legend(['training', 'validation'], loc='upper right')
-            # plt.savefig('results/{}_training.png'.format(self.nn.model.data.dataset))
-            # plt.show()
+
+        # Get losses from training
+        self.losses = getLosses(self.history, self.test_loss, self.nn.model.data.dataset, self.nn.model.verbose, self.nn.model.saveInfo)
 
         ## TODO: add option to save model and load saved models
 
@@ -157,9 +148,6 @@ class ModelNN():
             ['early stop tol', '{:.0e}'.format(self.earlyStopTol)],
             ['early stop patience', '{} epochs'.format(self.earlyStopPatience)],
             ['training time', '{:.2}s'.format(self.trainTime)],
-            ['min training loss', '{:.2}'.format(self.min_loss)],
-            ['min validation loss', '{:.2}'.format(self.min_valLoss)],
-            ['test loss evaluation', '{:.2}'.format(self.test_loss)],
             ['real code size', self.codeRealSize],
             ['avg pixel code mag', '{:.2}'.format(self.averageCodeMagnitude)]]
             name = 'results/trainModel_{}.png'.format(self.nn.model.data.dataset)
@@ -171,12 +159,6 @@ class ModelNN():
             ['early stop tol', '{:.0e}'.format(self.earlyStopTol)],
             ['early stop patience', '{} epochs'.format(self.earlyStopPatience)],
             ['training time', '{:.2}s'.format(self.trainTime)],
-            ['min training total loss', '{:.2}'.format(self.min_loss)],
-            ['min validation total loss', '{:.2}'.format(self.min_valLoss)],
-            ['test total loss evaluation', '{:.2}'.format(self.test_loss[0])],
-            ['test image E-D loss evaluation', '{:.2}'.format(self.test_loss[1])],
-            ['test code loss evaluation', '{:.2}'.format(self.test_loss[2])],
-            ['test image P-D loss evaluation', '{:.2}'.format(self.test_loss[3])],
             ['real code_E size', self.codeRealSize_E],
             ['real code_P size', self.codeRealSize_P],
             ['avg pixel code_E mag', '{:.2}'.format(self.averageCodeMagnitude_E)],

@@ -32,11 +32,25 @@ class PARAM_AE():
 
     def build(self, kw):
         def summary():
-            data = [['NN arch', 'Fully-connected'],
+            data = [['NN arch', self.data.arch],
             ['nHidLayers', self.nHidLayers],
-            ['nNeurons/hidLayer', self.nNeurons],
+            ['nNeurons', self.nNeurons],
             ['code size', self.codeSize],
             ['regularisation coef', '{:.0e}'.format(self.regularisation)],
+            ['num trainable param', self.nTrainParam],
+            ['num non trainable param', self.nNonTrainParam],
+            ['build time', '{:.2}s'.format(self.buildTime)]]
+            name = 'results/buildModel_{}.png'.format(self.data.dataset)
+            summaryInfo(data, self.verbose, self.saveInfo, name)
+
+        def summary_param():
+            data = [['NN arch', self.data.arch],
+            ['nHidLayers', self.nHidLayers],
+            ['nNeurons', self.nNeurons],
+            ['nHidLayers_P', self.nNeuronsParam],
+            ['nNeurons_P', self.nHidLayersParam],
+            ['code size', self.codeSize],
+            ['regularisation coef', '0'], # '{:.0e}'.format(self.regularisation)], TODO: update once we have reg in param_ae
             ['num trainable param', self.nTrainParam],
             ['num non trainable param', self.nNonTrainParam],
             ['build time', '{:.2}s'.format(self.buildTime)]]
@@ -64,8 +78,8 @@ class PARAM_AE():
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden2', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden3', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden4', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden5', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden6', kernel_initializer='he_normal'),
+                # tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden5', kernel_initializer='he_normal'),
+                # tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden6', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(25, activation='relu', name='encoder_code',
                 kernel_initializer='he_normal')
             ],
@@ -79,8 +93,8 @@ class PARAM_AE():
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden2', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden3', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden4', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden5', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden6', kernel_initializer='he_normal'),
+                # tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden5', kernel_initializer='he_normal'),
+                # tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden6', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(12800, activation=tf.nn.sigmoid, name='decoder_output_flat', kernel_initializer='he_normal'),
             ],
             name='decoder'
@@ -90,7 +104,7 @@ class PARAM_AE():
         parameter = tf.keras.Sequential(
             [
                 tf.keras.layers.Dense(25, activation='relu', name='param_hidden1', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(25, activation='relu', name='param_hidden2', kernel_initializer='he_normal'),
+                # tf.keras.layers.Dense(25, activation='relu', name='param_hidden2', kernel_initializer='he_normal'),
                 tf.keras.layers.Dense(25, activation='relu', name='param_code',
                 kernel_initializer='he_normal')
             ],
@@ -152,4 +166,7 @@ class PARAM_AE():
 
         stop = timeit.default_timer()
         self.buildTime = stop - start
-        summary()
+        if self.data.arch == 'param_ae':
+            summary_param()
+        else:   
+            summary()
