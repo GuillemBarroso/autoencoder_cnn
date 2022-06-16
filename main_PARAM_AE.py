@@ -27,19 +27,19 @@ if __name__ == '__main__':
     PLOT_PRED = True
     INDIV_TEST_LOSS = True
 
-    DATASET = 'beam_homog'
+    DATASET = 'beam_homog_big'
     TEST_DATA = 0.1
     # TEST_DATA = [mu1, mu2]
 
     ARCH = 'param_ae'
     CODE_SIZE = 25
     N_NEURONS = 200
-    N_HID_LAY = 2
+    N_HID_LAY = 4
     N_NEURONS_PARAM = 25
     N_HID_LAY_PARAM = 1
     REGULARISATION = 1e-4
 
-    EPOCHS = 20
+    EPOCHS = 300
     N_BATCH = 12
     EARLY_STOP_PATIENCE = 100
     EARLY_STOP_TOL = 1e-4

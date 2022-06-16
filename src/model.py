@@ -44,25 +44,26 @@ class ModelNN():
         self.optimizer = optimizer
         if self.nn.model.data.arch == 'param_ae':
             # Loss function terms
+            coef = self.nn.model.data.dimension/self.nn.model.codeSize
+            lossWeight = [1,1,1]
             # 1. Image loss: x = x_recon
             image_loss = tf.keras.losses.mean_squared_error(self.nn.model.x, self.nn.model.x_ED)
-            self.nn.model.autoencoder.add_loss(image_loss)
+            self.nn.model.autoencoder.add_loss(lossWeight[0]*image_loss)
 
             # 2. Future state prediction loss: x1 = x1_pred
             code_loss = tf.keras.losses.mean_squared_error(self.nn.model.code_E, self.nn.model.code_P)
-            self.nn.model.autoencoder.add_loss(code_loss)
+            self.nn.model.autoencoder.add_loss(lossWeight[1]*code_loss)
 
             imageParam_loss = tf.keras.losses.mean_squared_error(self.nn.model.x, self.nn.model.x_PD)
-            self.nn.model.autoencoder.add_loss(imageParam_loss)
+            self.nn.model.autoencoder.add_loss(lossWeight[2]*imageParam_loss)
 
             # Add metrics
             self.nn.model.autoencoder.add_metric(image_loss, name='L_image_ED')
             self.nn.model.autoencoder.add_metric(code_loss, name='L_code')
             self.nn.model.autoencoder.add_metric(imageParam_loss, name='L_image_PD')
 
-            coef = self.nn.model.data.dimension/self.nn.model.codeSize
             self.nn.model.autoencoder.summary()
-            self.nn.model.autoencoder.compile(optimizer=self.optimizer,loss_weights=[1,coef,1])
+            self.nn.model.autoencoder.compile(optimizer=self.optimizer) # loss_weights=[1,coef,1]
 
         else:
             self.loss = loss
@@ -88,11 +89,12 @@ class ModelNN():
                                                   restore_best_weights=True, min_delta=self.earlyStopTol)
 
         if self.nn.model.data.arch == 'param_ae':
-            self.history = self.nn.model.autoencoder.fit(x={'x': self.nn.model.data.x_train, 'mu': self.nn.model.data.mu_train}, epochs=self.epochs,
-                                       batch_size=self.nBatch, shuffle=True,
-                                       validation_data={'x': self.nn.model.data.x_val, 'mu': self.nn.model.data.mu_val},
-                                       verbose=self.nn.model.verbose,
-                                       callbacks=[earlyStop]
+            self.history = self.nn.model.autoencoder.fit(x={'x': self.nn.model.data.x_train, 'mu': self.nn.model.data.mu_train},
+                                    epochs=self.epochs,
+                                    batch_size=self.nBatch, shuffle=True,
+                                    validation_data={'x': self.nn.model.data.x_val, 'mu': self.nn.model.data.mu_val},
+                                    verbose=self.nn.model.verbose,
+                                    callbacks=[earlyStop]
             )
         else:
             x_data = self.nn.model.data.x_train

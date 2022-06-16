@@ -160,10 +160,10 @@ def plotTraining(train, trainTime, dataset):
     plt.title('Model loss. Training time = {:.2} min'.format(trainTime/60))
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.savefig('results/{}_training.png'.format(dataset))
     plt.legend(leg, loc='upper right')
     ax = plt.gca()
-    ax.set_ylim([0, 2])
+    ax.set_ylim([0, 0.5])
+    plt.savefig('results/{}_training.png'.format(dataset))
     plt.show()
 
 def getLosses(train, test_loss, dataset, verbose, saveInfo):
