@@ -32,6 +32,9 @@ class Data():
         self.paramTrain = [[], []]
         self.paramVal = [[], []]
         self.paramTest = [[], []]
+        self.mu_train = None
+        self.mu_val = None
+        self.mu_test = None
 
         assert isinstance(kw['DATASET'], str), '"dataset" variable must be a string'
         assert isinstance(kw['TEST_DATA'], (int,float, list)), '"testData" variable must be an integer, a float or a list'
@@ -87,7 +90,7 @@ class Data():
         self.normaliseDataset()
         getDataSize()
         summary()
-        if self.arch == 'fcnn':
+        if self.arch == 'fcnn' or 'param_ae':
             self.rehsapeDataToArray()
 
     def loadImagesFromDir(self):
@@ -115,8 +118,9 @@ class Data():
         elif self.dataset == 'beam_homog_big':
             self.datasetClass = BeamHomogBig()
             self.parametricProblem = True
-        else:
-            print('WARNING; no manual test selection implemented for this dataset')
+        elif self.dataset == 'beam_homog_test':
+            self.datasetClass = BeamHomog()
+            self.parametricProblem = True
 
         # Loop over images and store them in the proper format
         data = []
@@ -185,6 +189,10 @@ class Data():
                 self.x_train, self.x_val = train_test_split(self.x_train, test_size=valSize, shuffle=True)
             
             self.imgTestList = [self.imgList[x] for x in idx_test]
+        if self.parametricProblem:
+            self.mu_train = np.vstack((self.paramTrain[0], self.paramTrain[1])).T
+            self.mu_val = np.vstack((self.paramVal[0], self.paramVal[1])).T
+            self.mu_test = np.vstack((self.paramTest[0], self.paramTest[1])).T
     
     def getMusFromImgName(self, imgName):
         Fh, Fv, loc, pos = self.datasetClass.getParamsFromImageName(imgName)

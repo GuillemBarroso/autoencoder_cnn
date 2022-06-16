@@ -7,7 +7,7 @@ import numpy as np
 
 
 class CNN():
-    def __init__(self, data, verbose=False, saveInfo=False):
+    def __init__(self, data, kw):
         self.buildTime = None
         self.autoencoder = None
         self.encoder = None
@@ -23,15 +23,14 @@ class CNN():
         self.nNeurons = None
 
         assert isinstance(data, object), '"data" must be an object'
-        assert isinstance(verbose, bool), '"verbose" must be a boolean'
-        assert isinstance(saveInfo, bool), '"saveInfo" must be a boolean'
+        assert isinstance(kw['VERBOSE'], bool), '"verbose" must be a boolean'
+        assert isinstance(kw['SAVE_INFO'], bool), '"saveInfo" must be a boolean'
 
         self.data = data
-        self.verbose = verbose
-        self.saveInfo = saveInfo
+        self.verbose = kw['VERBOSE']
+        self.saveInfo = kw['SAVE_INFO']
 
-    def build(self, nConvBlocks=1, codeSize=25, regularisation= 1e-4, nFilters=10, 
-    kernelSize=3, stride=2, nHidLayers=2, nNeurons=100):
+    def build(self, kw):
         def summary():
             data = [['NN arch', 'Convolutional'],
             ['nConvBlocks', self.nConvBlocks],
@@ -48,14 +47,14 @@ class CNN():
             name = 'results/buildModel_{}.png'.format(self.data.dataset)
             summaryInfo(data, self.verbose, self.saveInfo, name)
 
-        self.nConvBlocks = nConvBlocks
-        self.nFilters = nFilters
-        self.kernelSize = kernelSize
-        self.stride = stride
-        self.codeSize = codeSize
-        self.regularisation = regularisation
-        self.nHidLayers = nHidLayers
-        self.nNeurons = nNeurons
+        self.nConvBlocks = kw['N_CONV_BLOCKS']
+        self.nFilters = kw['N_FILTERS']
+        self.kernelSize = kw['KERNEL_SIZE']
+        self.stride = kw['STRIDE']
+        self.codeSize = kw['CODE_SIZE']
+        self.regularisation = kw['REGULARISATION']
+        self.nHidLayers = kw['N_HID_LAY']
+        self.nNeurons = kw['N_NEURONS']
 
         def inputCheck():
             assert isinstance(self.nConvBlocks, int), '"nConvBlock" must be an integer'

@@ -1,19 +1,16 @@
 from src.fcnn import FCNN
 from src.cnn import CNN
+from src.param_ae import PARAM_AE
 
 class NN():
-    def __init__(self):
-        pass
-
-    def build(self, data, kw):
-
+    def __init__(self, data, kw):
         if kw['ARCH'] == 'fcnn':
-            nn = FCNN(data,kw['VERBOSE'], kw['SAVE_INFO'])
-            nn.build(kw['CODE_SIZE'], kw['N_NEURONS'], kw['N_HID_LAY'], kw['REGULARISATION'])
+            self.model = FCNN(data,kw)
         elif kw['ARCH'] == 'cnn':
-            nn = CNN(data,kw['VERBOSE'], kw['SAVE_INFO'])
-            nn.build(kw['N_CONV_BLOCKS'], kw['CODE_SIZE'], kw['REGULARISATION'], kw['N_FILTERS'], kw['KERNEL_SIZE'], kw['STRIDE'],
-            kw['N_HID_LAY'], kw['N_NEURONS'])
+            self.model = CNN(data,kw)
+        elif kw['ARCH'] == 'param_ae':
+            self.model = PARAM_AE(data,kw)
         else:
             raise ValueError('dataset "{}" not implemented!'.format(kw['ARCH']))
-        return nn
+
+        self.model.build(kw)

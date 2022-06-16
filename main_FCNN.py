@@ -27,7 +27,7 @@ if __name__ == '__main__':
     PLOT_PRED = True
     INDIV_TEST_LOSS = True
 
-    DATASET = 'beam_homog_big'
+    DATASET = 'beam_homog'
     TEST_DATA = 0.1
     # TEST_DATA = [mu1, mu2]
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     N_HID_LAY = 4
     REGULARISATION = 1e-4
 
-    EPOCHS = 500
+    EPOCHS = 2
     N_BATCH = 12
     EARLY_STOP_PATIENCE = 100
     EARLY_STOP_TOL = 1e-4
