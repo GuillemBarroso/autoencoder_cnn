@@ -75,6 +75,8 @@ class BeamHomog():
         elif mu2 == 180.0:
             Fh = 0
             Fv = -1
+        else:
+            raise ValueError('requested mu2 = {} not available in dataset'.format(mu2))
 
         if mu1 < 1.0:
             loc = 'B'
@@ -85,6 +87,8 @@ class BeamHomog():
         elif 2.0 <= mu1:
             loc = 'T'
             pos = 1 - (mu1 - 2)
+        else:
+            raise ValueError("requested mu1 = {} outside mu1's range".format(mu1))
 
         pos = round(pos, 2)
         if pos == 0.0:

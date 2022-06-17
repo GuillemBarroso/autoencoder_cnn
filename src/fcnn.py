@@ -49,11 +49,12 @@ class FCNN():
         start = timeit.default_timer()
         input_img = keras.Input(shape=(self.data.dimension,))
         hidReg = 0
+
         # Encoder
         encoded = layers.Dense(self.nNeurons, activation='relu', kernel_initializer='he_normal')(input_img)
         for _ in range(self.nHidLayers-1):
             encoded = layers.Dense(self.nNeurons, activation='relu', kernel_initializer='he_normal', kernel_regularizer=keras.regularizers.l1(hidReg))(encoded)
-        
+            
         # Code
         encoded = layers.Dense(self.codeSize, activation='relu', kernel_initializer='he_normal', 
         kernel_regularizer=keras.regularizers.l1(self.regularisation))(encoded)

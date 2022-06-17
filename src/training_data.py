@@ -7,7 +7,7 @@ import os, os.path
 import timeit
 from src.postprocessing import summaryInfo
 from src.read_txt import Mesh, TxtData
-from src.testData_beam_homog import BeamHomog
+from src.beam_homog import BeamHomog
 from src.beam_homog_big import BeamHomogBig
 
 
@@ -165,7 +165,7 @@ class Data():
                     paramNoTest[1].append(params[1][iImage])
 
             if len(x_test) != len(self.testData):
-                print('WARNING: number of test images requested is {}. Found {} with the same name in dataset.'.format(
+                raise ValueError('WARNING: number of test images requested is {}. Found {} with the same name in dataset.'.format(
                     len(self.testData), len(x_test)))
 
             if self.parametricProblem:

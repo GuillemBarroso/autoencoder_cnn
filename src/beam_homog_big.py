@@ -19,7 +19,7 @@ class BeamHomogBig():
         return mu1, mu2
 
     def getMusFromParams(self, Fh, Fv, loc, pos):
-        if Fh == 0.0 and Fv == 1.0:
+        if Fh == 0 and Fv == 1:
             mu2 = 0
         elif Fh == 0.052336 and Fv == 0.99863:
             mu2 = 3
@@ -79,7 +79,7 @@ class BeamHomogBig():
             mu2 = 84
         elif Fh == 0.99863 and Fv == 0.052336:
             mu2 = 87
-        elif Fh == 1.0 and Fv == 0.0:
+        elif Fh == 1 and Fv == 0:
             mu2 = 90
         elif Fh == 0.99863 and Fv == -0.052336:
             mu2 = 93
@@ -139,6 +139,8 @@ class BeamHomogBig():
             mu2 = 174
         elif Fh == 0.052336 and Fv == -0.99863:
             mu2 = 177
+        else:
+            raise ValueError('requested mu2 = {} not available in dataset'.format(mu2))
         
         if loc == 'B':
             mu1 = pos
@@ -151,21 +153,21 @@ class BeamHomogBig():
 
     def getParamsFromMus(self, mu1, mu2):
         if mu2 == 0:
-            Fh = 0.0
-            Fv = 1.0
+            Fh = 0
+            Fv = 1
         elif mu2 == 3: 
             Fh = 0.052336 
             Fv = 0.99863
         elif mu2 == 6:
-            Fh == 0.104528
-            Fv == 0.994522
+            Fh = 0.104528
+            Fv = 0.994522
             
         elif mu2 == 9:
             Fh = 0.156434
             Fv = 0.987688
         elif mu2 == 12:
             Fh = 0.207912
-            Fv == 0.978148
+            Fv = 0.978148
         elif mu2 == 15: 
             Fh = 0.258819
             Fv = 0.965926
@@ -174,12 +176,12 @@ class BeamHomogBig():
             Fv = 0.951057
             
         elif mu2 == 21: 
-            Fh == 0.358368
-            Fv == 0.93358
+            Fh = 0.358368
+            Fv = 0.93358
            
         elif mu2 == 24:
-            Fh == 0.406737
-            Fv == 0.913545
+            Fh = 0.406737
+            Fv = 0.913545
             
         elif mu2 == 27: 
             Fh = 0.45399
@@ -194,8 +196,8 @@ class BeamHomogBig():
             Fv = 0.838671
             
         elif mu2 == 36: 
-            Fh == 0.587785
-            Fv == 0.809017
+            Fh = 0.587785
+            Fv = 0.809017
             
         elif mu2 == 39: 
             Fh = 0.62932 
@@ -239,7 +241,7 @@ class BeamHomogBig():
             
         elif mu2 == 69:
             Fh = 0.93358
-            Fv == 0.358368
+            Fv = 0.358368
             
         elif mu2 == 72:
             Fh = 0.951057
@@ -266,8 +268,8 @@ class BeamHomogBig():
             Fv = 0.052336
             
         elif mu2 == 90:
-            Fh = 1.0
-            Fv = 0.0
+            Fh = 1
+            Fv = 0
             
         elif mu2 == 93:
             Fh = 0.99863
@@ -384,6 +386,8 @@ class BeamHomogBig():
         elif mu2 == 177:
             Fh = 0.052336
             Fv = -0.99863           
+        else:
+            raise ValueError('requested mu2 = {} not available in dataset'.format(mu2))
 
         if mu1 < 1.0:
             loc = 'B'
@@ -394,6 +398,7 @@ class BeamHomogBig():
         elif 2.0 <= mu1:
             loc = 'T'
             pos = 1 - (mu1 - 2)
+        
 
         pos = round(pos, 2)
         if pos == 0.0:

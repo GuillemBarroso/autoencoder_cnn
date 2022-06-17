@@ -57,6 +57,12 @@ class PARAM_AE():
             name = 'results/buildModel_{}.png'.format(self.data.dataset)
             summaryInfo(data, self.verbose, self.saveInfo, name)
 
+        def add_l2_regularization(layer):
+            def _add_l2_regularization():
+                l2 = tf.keras.regularizers.l2(1e-4)
+                return l2(layer.kernel)
+            return _add_l2_regularization
+
         assert isinstance(kw['CODE_SIZE'], int), '"codeSize" must be an integer'
         assert isinstance(kw['N_NEURONS'], int), '"nNeurons" must be an integer'
         assert isinstance(kw['N_HID_LAY'], int), '"codenHidLayersSize" must be an integer'
@@ -71,68 +77,23 @@ class PARAM_AE():
 
         start = timeit.default_timer()
 
-        # Encodes input to low-dimensional code
-        self.encoder = tf.keras.Sequential(
-            [
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden1', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden2', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden3', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden4', kernel_initializer='he_normal'),
-                # tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden5', kernel_initializer='he_normal'),
-                # tf.keras.layers.Dense(200, activation=tf.nn.relu, name='encoder_hidden6', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(25, activation='relu', name='encoder_code',
-                kernel_initializer='he_normal')
-            ],
-            name='encoder'
-        )
+        # Encoder
+        self.encoder = tf.keras.Sequential()
+        for _ in range(self.nHidLayers):
+            self.encoder.add(layers.Dense(self.nNeurons, activation='relu', kernel_initializer='he_normal'))
+        self.encoder.add(layers.Dense(self.codeSize, activation='relu', kernel_initializer='he_normal'))
 
-        # Decodes from low-dimensional code to output
-        decoder = tf.keras.Sequential(
-            [
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden1', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden2', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden3', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden4', kernel_initializer='he_normal'),
-                # tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden5', kernel_initializer='he_normal'),
-                # tf.keras.layers.Dense(200, activation=tf.nn.relu, name='decoder_hidden6', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(12800, activation=tf.nn.sigmoid, name='decoder_output_flat', kernel_initializer='he_normal'),
-            ],
-            name='decoder'
-        )
+        # Decoder
+        decoder = tf.keras.Sequential()
+        for _ in range(self.nHidLayers):
+            decoder.add(layers.Dense(self.nNeurons, activation='relu', kernel_initializer='he_normal'))
+        decoder.add(layers.Dense(self.data.dimension, activation='sigmoid', kernel_initializer='he_normal'))
 
-        # Parameter NN
-        parameter = tf.keras.Sequential(
-            [
-                tf.keras.layers.Dense(25, activation='relu', name='param_hidden1', kernel_initializer='he_normal'),
-                # tf.keras.layers.Dense(25, activation='relu', name='param_hidden2', kernel_initializer='he_normal'),
-                tf.keras.layers.Dense(25, activation='relu', name='param_code',
-                kernel_initializer='he_normal')
-            ],
-            name='parameter'
-        )
-
-        #######################################
-        # # Encoder
-        # # encoder = layers.Dense(self.nNeurons, activation='relu', kernel_initializer='he_normal')(input_img)
-        # for _ in range(self.nHidLayers):
-        #     self.encoder = layers.Dense(self.nNeurons, activation='relu', kernel_initializer='he_normal')
-        # self.encoder = layers.Dense(self.codeSize, activation='relu', kernel_initializer='he_normal')
-        
-        # # Decoder
-        # # decoded = layers.Dense(self.nNeurons, activation='relu', kernel_initializer='he_normal', kernel_regularizer=keras.regularizers.l1(hidReg))(encoded)
-        # for _ in range(self.nHidLayers):
-        #     decoder = layers.Dense(self.nNeurons, activation='relu', kernel_initializer='he_normal')
-        # decoder = layers.Dense(self.data.dimension, activation='sigmoid', kernel_initializer='he_normal')
-
-        # # Parameter
-        # for _ in range(self.nHidLayersParam-1):
-        #     parameter = layers.Dense(self.nNeuronsParam, activation='relu', kernel_initializer='he_normal')
-        # parameter = layers.Dense(self.codeSize, activation='relu', kernel_initializer='he_normal')
-
-        # # Create autoencoder and encoder objects
-        # self.autoencoder = Model(input_img, decoded)
-        # self.encoder = Model(input_img, encoded)
-        #######################################
+        # Parameter
+        parameter = tf.keras.Sequential()
+        for _ in range(self.nHidLayersParam):
+            parameter.add(layers.Dense(self.nNeuronsParam, activation='relu', kernel_initializer='he_normal'))
+        parameter.add(layers.Dense(self.codeSize, activation='relu', kernel_initializer='he_normal'))
 
         # Connect sub-models
         self.x = tf.keras.Input(shape=(self.data.dimension,))
